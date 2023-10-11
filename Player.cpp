@@ -15,8 +15,11 @@ Player::~Player()
 {
 }
 
-void Player::Move()
+void Player::Move(float time)
 {
+	float smooth = 0.95;
+	velocity.x = float(targetVelocity.x) * (1 - smooth) * time + velocity.x * smooth;
+	velocity.y = float(targetVelocity.y) * (1 - smooth) * time + velocity.y * smooth;
 	position.x += velocity.x;
 	position.y += velocity.y;
 }

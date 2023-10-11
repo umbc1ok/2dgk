@@ -63,23 +63,69 @@ int main(int argc, char* args[])
 	}
 	else
 	{
-		double smooth = 0.955;
+		Uint64 PREVIOUS = 0;
+		Uint64 CURRENT = 0;
+		Uint64 deltaTime;
+		Uint64 desiredFrameTime = 17; // 1/60 of a second
 		while (!quit) {
+
+			//counting frame time
+			PREVIOUS = CURRENT;
+			CURRENT = SDL_GetPerformanceCounter();
+			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
+
+
 			//Load media
 			char name1[] = "circle.png";
 			char name2[] = "kwadrat.png";
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
 				quit = handleInput(&e, p1,p2);
-				pushed = true;
 			}
-			if (!pushed) {
-				p1->targetVelocity = { 0,0 };
+			p1->targetVelocity = { 0,0 };
+			int maxSpeed = 2;
+			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+			if (currentKeyStates[SDL_SCANCODE_UP])
+			{
+				p1->targetVelocity.y = -maxSpeed;
 			}
-			p1->velocity.x = double(p1->targetVelocity.x) * (1.0 - smooth) + double(p1->velocity.x) * smooth;
-			p1->velocity.y = p1->targetVelocity.y * (1.0 - smooth) + p1->velocity.y * smooth;
-			//std::cout << std::to_string(p1->velocity.x) << std::endl;
-			p1->Move();
+
+			if (currentKeyStates[SDL_SCANCODE_DOWN])
+			{
+				p1->targetVelocity.y = maxSpeed;
+			}
+
+			if (currentKeyStates[SDL_SCANCODE_LEFT])
+			{
+				p1->targetVelocity.x = -maxSpeed;
+			}
+
+			if (currentKeyStates[SDL_SCANCODE_RIGHT])
+			{
+				p1->targetVelocity.x = maxSpeed;
+			}
+			if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
+			{
+				p1->targetVelocity.y = -maxSpeed;
+				p1->targetVelocity.x = -maxSpeed;
+			}
+			if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
+			{
+				p1->targetVelocity.y = -maxSpeed;
+				p1->targetVelocity.x = maxSpeed;
+			}
+			if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
+			{
+				p1->targetVelocity.y = maxSpeed;
+				p1->targetVelocity.x = -maxSpeed;
+			}
+			if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
+			{
+				p1->targetVelocity.y = maxSpeed;
+				p1->targetVelocity.x = maxSpeed;
+			}
+			
+			p1->Move(deltaTime);
 
 			//Apply the image
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -95,7 +141,12 @@ int main(int argc, char* args[])
 
 			//Update screen
 			SDL_RenderPresent(gRenderer);
-			
+			if (desiredFrameTime > deltaTime) // If the desired frame delay is greater than the deltaTime
+			{
+				SDL_Delay(desiredFrameTime - deltaTime); // Delay for the remaining time
+			}
+
+
 		}
 	}
 	close();

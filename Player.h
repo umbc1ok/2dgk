@@ -8,6 +8,6 @@ public:
 	Vector2 position;
 	Vector2 velocity;
 	Vector2 targetVelocity;
-	void Move();
+	void Move(float time);
 };
 
