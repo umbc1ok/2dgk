@@ -2,7 +2,7 @@
 
 Player::Player()
 {
-	Player::velocity = 0;
+	Player::velocity = 30;
 	Player::x = 0;
 	Player::y = 0;
 }

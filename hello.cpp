@@ -38,6 +38,7 @@ bool loadMedia(char name[]);
 void putOnScreen(char name[], int x, int y);
 SDL_Surface* loadSurface(std::string path);
 SDL_Texture* loadTexture(std::string path);
+void DrawCircle(SDL_Renderer* renderer, int centreX, int centreY, int radius);
 
 
 
@@ -70,10 +71,20 @@ int main(int argc, char* args[])
 				quit = handleInput(&e, p1,p2);
 			}
 			//Apply the image
+			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
 			SDL_RenderClear(gRenderer);
-			loadMedia(name1);
-			SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
+
+
+			//Render red filled quad
+			SDL_Rect fillRect = { p1->x, p1->y, 100, 100 };
+			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+			SDL_RenderFillRect(gRenderer, &fillRect);
+
+			DrawCircle(gRenderer, p2->x, p2->y, 25);
+
+			//Update screen
 			SDL_RenderPresent(gRenderer);
+
 
 
 
@@ -237,4 +248,27 @@ SDL_Texture* loadTexture(std::string path)
 	}
 	return newTexture;
 }
+void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius)
+{
+	SDL_Color color;
+	color.r = 100;
+	color.g = 50;
+	color.b = 30;
+	color.a = 15;
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	for (int w = 0; w < radius * 2; w++)
+	{
+		for (int h = 0; h < radius * 2; h++)
+		{
+			int dx = radius - w; // horizontal offset
+			int dy = radius - h; // vertical offset
+			if ((dx * dx + dy * dy) <= (radius * radius))
+			{
+				SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+			}
+		}
+	}
+}
+
+
 
