@@ -151,6 +151,7 @@
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dataStructures.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>

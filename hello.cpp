@@ -63,47 +63,39 @@ int main(int argc, char* args[])
 	}
 	else
 	{
+		double smooth = 0.955;
 		while (!quit) {
 			//Load media
 			char name1[] = "circle.png";
 			char name2[] = "kwadrat.png";
+			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
 				quit = handleInput(&e, p1,p2);
+				pushed = true;
 			}
+			if (!pushed) {
+				p1->targetVelocity = { 0,0 };
+			}
+			p1->velocity.x = double(p1->targetVelocity.x) * (1.0 - smooth) + double(p1->velocity.x) * smooth;
+			p1->velocity.y = p1->targetVelocity.y * (1.0 - smooth) + p1->velocity.y * smooth;
+			//std::cout << std::to_string(p1->velocity.x) << std::endl;
+			p1->Move();
+
 			//Apply the image
-			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear(gRenderer);
 
 
 			//Render red filled quad
-			SDL_Rect fillRect = { p1->x, p1->y, 100, 100 };
+			SDL_Rect fillRect = { p1->position.x, p1->position.y, 50, 50 };
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
 			SDL_RenderFillRect(gRenderer, &fillRect);
 
-			DrawCircle(gRenderer, p2->x, p2->y, 25);
+			DrawCircle(gRenderer, p2->position.x, p2->position.y, 25);
 
 			//Update screen
 			SDL_RenderPresent(gRenderer);
-
-
-
-
-
-			/*SDL_UpdateWindowSurface(gWindow);
-			SDL_FillRect(gScreenSurface, NULL, SDL_MapRGB(gScreenSurface->format, 0xFF, 0xFF, 0x00));
-
-			loadMedia(name1);
-			//Apply the image stretched
-			SDL_Rect stretchRect;
-			stretchRect.x = p1->x;
-			stretchRect.y = p1->y;
-			stretchRect.w = 10;
-			stretchRect.h = 10;
-			SDL_BlitScaled(gStretchedSurface, NULL, gScreenSurface, &stretchRect);
-			*/
 			
-			//putOnScreen(name1, p1->x, p1->y);
-			//putOnScreen(name2, p2->x, p2->y);
 		}
 	}
 	close();
@@ -144,7 +136,8 @@ bool init()
 			{
 				//Initialize renderer color
 				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
+				// set blend mode so that alpha values matter
+				SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 				//Initialize PNG loading
 				int imgFlags = IMG_INIT_PNG;
 				if (!(IMG_Init(imgFlags) & imgFlags))
@@ -254,7 +247,7 @@ void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius)
 	color.r = 100;
 	color.g = 50;
 	color.b = 30;
-	color.a = 15;
+	color.a = 100;
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	for (int w = 0; w < radius * 2; w++)
 	{
