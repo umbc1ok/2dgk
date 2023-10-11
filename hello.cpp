@@ -6,6 +6,8 @@ and may not be redistributed without written permission.*/
 #include <SDL_image.h>
 #include <stdio.h>
 #include <iostream>
+#include "input.h"
+#include "Player.h"
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 800;
@@ -20,38 +22,37 @@ SDL_Surface* gScreenSurface = NULL;
 //The image we will load and show on the screen
 SDL_Surface* loadedSurface = NULL;
 
+//Current displayed image
+SDL_Surface* gStretchedSurface = NULL;
+
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
+//Current displayed texture
+SDL_Texture* gTexture = NULL;
+
+
+
 bool init();
 void close();
-SDL_Surface* loadMedia(char name[]);
+bool loadMedia(char name[]);
 void putOnScreen(char name[], int x, int y);
+SDL_Surface* loadSurface(std::string path);
 
-
-enum KeyPressSurfaces
-{
-	KEY_PRESS_SURFACE_DEFAULT,
-	KEY_PRESS_SURFACE_UP,
-	KEY_PRESS_SURFACE_DOWN,
-	KEY_PRESS_SURFACE_LEFT,
-	KEY_PRESS_SURFACE_RIGHT,
-	KEY_PRESS_SURFACE_TOTAL
-};
 
 
 int main(int argc, char* args[])
 {
+	//Setting up players
+	Player* p1 = new Player();
+	Player* p2 = new Player();
+
 	//Main loop flag
 	bool quit = false;
 
 	//Event handler
 	SDL_Event e;
-
-	int imgFlags = IMG_INIT_PNG;
 	bool success = true;
-	if (!(IMG_Init(imgFlags) & imgFlags))
-	{
-		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-		success = false;
-	}
+
 
 	//Start up SDL and create window
 	if (!init())
@@ -60,57 +61,31 @@ int main(int argc, char* args[])
 	}
 	else
 	{
-		int x = 0;
-		int y = 0;
-		int x2=0, y2=0;
 		while (!quit) {
 			//Load media
 			char name1[] = "circle.png";
 			char name2[] = "kwadrat.png";
 			while (SDL_PollEvent(&e) != 0) {
-				if (e.type == SDL_QUIT)
-				{
-					quit = true;
-				}
-				else if (e.type == SDL_KEYDOWN)
-				{
-					//Select surfaces based on key press
-					switch (e.key.keysym.sym)
-					{
-					case SDLK_UP:
-						y -= 10;
-						break;
-
-					case SDLK_DOWN:
-						y += 10;
-						break;
-
-					case SDLK_LEFT:
-						x -= 10;
-						break;
-
-					case SDLK_RIGHT:
-						x += 10;
-						break;
-					default:
-						//gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT];
-						break;
-					}
-				}
-				else if (e.type == SDL_MOUSEMOTION) {
-					SDL_GetMouseState(&x2, &y2);
-				}
+				quit = handleInput(&e, p1,p2);
 			}
 			//Apply the image
 			SDL_UpdateWindowSurface(gWindow);
 			SDL_FillRect(gScreenSurface, NULL, SDL_MapRGB(gScreenSurface->format, 0xFF, 0xFF, 0x00));
-			putOnScreen(name1, x, y);
-			putOnScreen(name2, x2, y2);
-		}
+
+			loadMedia(name1);
+			//Apply the image stretched
+			SDL_Rect stretchRect;
+			stretchRect.x = p1->x;
+			stretchRect.y = p1->y;
+			stretchRect.w = 10;
+			stretchRect.h = 10;
+			SDL_BlitScaled(gStretchedSurface, NULL, gScreenSurface, &stretchRect);
 
 			
+			//putOnScreen(name1, p1->x, p1->y);
+			//putOnScreen(name2, p2->x, p2->y);
+		}
 	}
-	//Free resources and close SDL
 	close();
 
 	return 0;
@@ -138,9 +113,16 @@ bool init()
 		}
 		else
 		{
+
 			//Get window surface
 			gScreenSurface = SDL_GetWindowSurface(gWindow);
 		}
+	}
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags))
+	{
+		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+		success = false;
 	}
 
 	return success;
@@ -159,27 +141,23 @@ void close()
 	//Quit SDL subsystems
 	SDL_Quit();
 }
-SDL_Surface* loadMedia(char name[])
-{
-	//Loading success flag
-	bool success = true;
+
+SDL_Surface* loadSurface(std::string path) {
+	//The final optimized image
 	SDL_Surface* optimizedSurface = NULL;
 
-	//Load splash image
-	loadedSurface = IMG_Load(name);
+	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
 	if (loadedSurface == NULL)
 	{
-		printf("Unable to load image %s! SDL Error: %s\n", name, SDL_GetError());
-		success = false;
+		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 	}
 	else
 	{
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
 		//Convert surface to screen format
 		optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
 		if (optimizedSurface == NULL)
 		{
-			printf("Unable to optimize image %s! SDL Error: %s\n", name, SDL_GetError());
+			printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 		}
 		//Get rid of old loaded surface
 		SDL_FreeSurface(loadedSurface);
@@ -188,19 +166,19 @@ SDL_Surface* loadMedia(char name[])
 	return optimizedSurface;
 }
 
-void putOnScreen(char name[], int x, int y)
-{
-	SDL_Surface* optimizedSurface = loadMedia(name);
-	SDL_Rect* dstrect = new SDL_Rect;
-	dstrect->x = x;
-	dstrect->y = y;
-	dstrect->w = optimizedSurface->w;
-	dstrect->h = optimizedSurface->h;
-	SDL_BlitSurface(optimizedSurface, NULL, gScreenSurface, dstrect);
-	delete dstrect;
-}
 
-void keepWindowAlive() {
-	//Hack to get window to stay up
-	SDL_Event e; bool quit = false; while (quit == false) { while (SDL_PollEvent(&e)) { if (e.type == SDL_QUIT) quit = true; } }
+
+bool loadMedia(char name[])
+{
+	//Loading success flag
+	bool success = true;
+
+	//Load stretching surface
+	gStretchedSurface = loadSurface(name);
+	if (gStretchedSurface == NULL)
+	{
+		printf("Failed to load stretching image!\n");
+		success = false;
+	}
+	return success;
 }

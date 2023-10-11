@@ -78,11 +78,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <ExternalIncludePath>C:\uczelnia\Libraries\SDL2_image-2.6.3\include;C:\uczelnia\Libraries\SDL2-2.28.4\include;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>C:\uczelnia\Libraries\SDL2_image-2.6.3\lib\x64;C:\uczelnia\Libraries\SDL2-2.28.4\lib\x64;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>F:\Libraries\SDL2_image-2.6.3\include;F:\Libraries\SDL2-2.28.4\include;C:\uczelnia\Libraries\SDL2_image-2.6.3\include;C:\uczelnia\Libraries\SDL2-2.28.4\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>F:\Libraries\SDL2_image-2.6.3\lib\x64;F:\Libraries\SDL2-2.28.4\lib\x64;C:\uczelnia\Libraries\SDL2_image-2.6.3\lib\x64;C:\uczelnia\Libraries\SDL2-2.28.4\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\Libraries\SDL2_image-2.6.3\include;F:\Libraries\SDL2-2.28.4\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>F:\Libraries\SDL2_image-2.6.3\include;F:\Libraries\SDL2-2.28.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\Libraries\SDL2_image-2.6.3\lib\x64;F:\Libraries\SDL2-2.28.4\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <ExternalIncludePath>F:\Libraries\SDL2_image-2.6.3\include;F:\Libraries\SDL2-2.28.4\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,7 +126,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;Shell32.lib.</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,10 +143,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;Shell32.lib.</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="hello.cpp" />
+    <ClCompile Include="Player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="input.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
