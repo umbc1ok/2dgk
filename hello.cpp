@@ -83,7 +83,7 @@ int main(int argc, char* args[])
 				quit = handleInput(&e, p1,p2);
 			}
 			p1->targetVelocity = { 0,0 };
-			int maxSpeed = 2;
+			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 			if (currentKeyStates[SDL_SCANCODE_UP])
 			{
