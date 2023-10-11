@@ -1,9 +1,13 @@
 #pragma once
+
+#include "dataStructures.h"
 class Player {
 public:
 	Player();
 	~Player();
-	int x;
-	int y;
-	int velocity;
+	Vector2 position;
+	Vector2 velocity;
+	Vector2 targetVelocity;
+	void Move(float time);
 };
+
