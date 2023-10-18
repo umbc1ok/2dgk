@@ -11,7 +11,7 @@ and may not be redistributed without written permission.*/
 #include "MapLoader.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 900;
+const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
 //The window we'll be rendering to
