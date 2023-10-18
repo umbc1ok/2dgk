@@ -5,3 +5,6 @@ struct Vector2f {
 struct Vector2i {
 	int x, y;
 };
+struct Vector4f {
+	int x, y, z, a;
+};

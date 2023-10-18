@@ -8,9 +8,10 @@ and may not be redistributed without written permission.*/
 #include <iostream>
 #include "input.h"
 #include "Player.h"
+#include "MapLoader.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 800;
+const int SCREEN_WIDTH = 900;
 const int SCREEN_HEIGHT = 600;
 
 //The window we'll be rendering to
@@ -28,16 +29,13 @@ SDL_Surface* gStretchedSurface = NULL;
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
 //Current displayed texture
-SDL_Texture* gTexture = NULL;
+SDL_Texture* woodTexture = NULL;
+SDL_Texture* grassTexture = NULL;
 
 
 
 bool init();
 void close();
-bool loadMedia(char name[]);
-void putOnScreen(char name[], int x, int y);
-SDL_Surface* loadSurface(std::string path);
-SDL_Texture* loadTexture(std::string path);
 void DrawCircle(SDL_Renderer* renderer, int centreX, int centreY, int radius);
 
 
@@ -67,6 +65,14 @@ int main(int argc, char* args[])
 		Uint64 CURRENT = 0;
 		Uint64 deltaTime;
 		Uint64 desiredFrameTime = 17; // 1/60 of a second
+
+
+		char arr[] = "wood.jpg";
+		loadMedia(arr, &woodTexture, gRenderer);
+		char arr2[] = "grass.jpg";
+		loadMedia(arr2, &grassTexture, gRenderer);
+		std::vector<std::string> map = loadMapFromFile("map.txt");
+
 		while (!quit) {
 
 			//counting frame time
@@ -75,9 +81,6 @@ int main(int argc, char* args[])
 			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
 
 
-			//Load media
-			char name1[] = "circle.png";
-			char name2[] = "kwadrat.png";
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
 				quit = handleInput(&e, p1,p2);
@@ -135,6 +138,15 @@ int main(int argc, char* args[])
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear(gRenderer);
 
+			int numberOfColumns = SCREEN_WIDTH / 25;
+			int numberOfRows = SCREEN_HEIGHT / 25;
+
+			for (int i = 0; i < numberOfRows; i++) {
+				std::string line = map.at(i);
+				for (int j = 0; j < numberOfColumns; j++) {
+					drawElement(j*25, i*25, line.at(j), gRenderer,woodTexture,grassTexture);
+				}
+			}
 
 			//Render red filled quad
 			SDL_Rect fillRect = { p1->position.x, p1->position.y, 50, 50 };
@@ -214,7 +226,7 @@ bool init()
 void close()
 {
 	//Deallocate surface
-	SDL_DestroyTexture(gTexture);
+	SDL_DestroyTexture(woodTexture);
 	loadedSurface = NULL;
 
 	//Destroy window
@@ -228,72 +240,7 @@ void close()
 	SDL_Quit();
 }
 
-SDL_Surface* loadSurface(std::string path) {
-	//The final optimized image
-	SDL_Surface* optimizedSurface = NULL;
 
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-	}
-	else
-	{
-		//Convert surface to screen format
-		optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
-		if (optimizedSurface == NULL)
-		{
-			printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return optimizedSurface;
-}
-
-
-
-bool loadMedia(char name[])
-{
-	//Loading success flag
-	bool success = true;
-
-	//Load stretching surface
-	gTexture = loadTexture(name);
-	if (gTexture == NULL)
-	{
-		printf("Failed to load stretching image!\n");
-		success = false;
-	}
-	return success;
-}
-
-SDL_Texture* loadTexture(std::string path)
-{
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-	}
-	else
-	{
-		//Create texture from surface pixels
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL)
-		{
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-	return newTexture;
-}
 void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius)
 {
 	SDL_Color color;
