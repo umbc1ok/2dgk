@@ -83,25 +83,29 @@ int main(int argc, char* args[])
 				quit = handleInput(&e, p1,p2);
 			}
 			p1->targetVelocity = { 0,0 };
-			int maxSpeed = 10;
+			int maxSpeed = 20;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 			if (currentKeyStates[SDL_SCANCODE_UP])
 			{
+				std::cout << "UP\n";
 				p1->targetVelocity.y = -maxSpeed;
 			}
 
 			if (currentKeyStates[SDL_SCANCODE_DOWN])
 			{
+				std::cout << "DOWN\n";
 				p1->targetVelocity.y = maxSpeed;
 			}
 
 			if (currentKeyStates[SDL_SCANCODE_LEFT])
 			{
+				std::cout << "LEFT\n";
 				p1->targetVelocity.x = -maxSpeed;
 			}
 
 			if (currentKeyStates[SDL_SCANCODE_RIGHT])
 			{
+				std::cout << "RIGHT\n";
 				p1->targetVelocity.x = maxSpeed;
 			}
 			if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
@@ -125,7 +129,7 @@ int main(int argc, char* args[])
 				p1->targetVelocity.x = maxSpeed;
 			}
 			
-			p1->Move(deltaTime);
+			p1->Move();
 
 			//Apply the image
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -134,7 +138,7 @@ int main(int argc, char* args[])
 
 			//Render red filled quad
 			SDL_Rect fillRect = { p1->position.x, p1->position.y, 50, 50 };
-			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
 			SDL_RenderFillRect(gRenderer, &fillRect);
 
 			DrawCircle(gRenderer, p2->position.x, p2->position.y, 25);
@@ -145,8 +149,6 @@ int main(int argc, char* args[])
 			{
 				SDL_Delay(desiredFrameTime - deltaTime); // Delay for the remaining time
 			}
-
-
 		}
 	}
 	close();
