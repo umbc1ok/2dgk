@@ -9,7 +9,7 @@ void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* 
 SDL_Surface* loadSurface(std::string path, SDL_Surface* gScreenSurface);
 bool loadMedia(char name[], SDL_Texture** gTexture, SDL_Renderer* gRenderer);
 SDL_Texture* loadTexture(std::string path, SDL_Renderer* gRenderer);
-
+void drawPlayer(SDL_Renderer* gRenderer, SDL_Texture* playerTexture, int x, int y);
 
 std::vector<std::string> loadMapFromFile(std::string fileName) {
 	std::vector<std::string> map;
@@ -43,6 +43,13 @@ void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* 
 	}
 	
 }
+void drawPlayer(SDL_Renderer* gRenderer, SDL_Texture* playerTexture, int x, int y) {
+	SDL_Rect fillRect = { x, y, 50, 50 };
+	SDL_RenderCopy(gRenderer, playerTexture, NULL, &fillRect);
+}
+
+
+
 
 SDL_Surface* loadSurface(std::string path, SDL_Surface* gScreenSurface) {
 	//The final optimized image

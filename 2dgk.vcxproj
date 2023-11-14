@@ -151,7 +151,9 @@
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="dataStructures.h" />
+    <ClInclude Include="definitions.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="Player.h" />

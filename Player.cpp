@@ -10,7 +10,6 @@ Player::Player()
 	Player::velocity.y = 0;
 	Player::targetVelocity.x = 0;
 	Player::targetVelocity.y = 0;
-
 }
 
 Player::~Player()

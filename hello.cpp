@@ -9,13 +9,9 @@ and may not be redistributed without written permission.*/
 #include "input.h"
 #include "Player.h"
 #include "MapLoader.h"
+#include "definitions.h"
+#include "camera.h"
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-
-const int LEVEL_WIDTH = 2400;
-const int LEVEL_HEIGHT = 600;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -34,6 +30,7 @@ SDL_Renderer* gRenderer = NULL;
 //Current displayed texture
 SDL_Texture* woodTexture = NULL;
 SDL_Texture* grassTexture = NULL;
+SDL_Texture* playerTexture = NULL;
 
 
 
@@ -50,7 +47,10 @@ int main(int argc, char* args[])
 	Player* p2 = new Player();
 
 
+	// camera coordinates are basically the top left corner of the window, not the center
 	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	// boundingbox of the camera
+	Vector2i boundingBox = { 50,50 };
 
 	//Main loop flag
 	bool quit = false;
@@ -77,10 +77,14 @@ int main(int argc, char* args[])
 		loadMedia(arr, &woodTexture, gRenderer);
 		char arr2[] = "grass.jpg";
 		loadMedia(arr2, &grassTexture, gRenderer);
+		char arr3[] = "player.png";
+		loadMedia(arr3, &playerTexture, gRenderer);
+
+
 		std::vector<std::string> map = loadMapFromFile("map.txt");
 
-		Vector2i boundingBox = { 150,150 };
 		int targetX = 0;
+		float cameraSmooth = 0.93f;
 		while (!quit) {
 
 			//counting frame time
@@ -88,36 +92,13 @@ int main(int argc, char* args[])
 			CURRENT = SDL_GetPerformanceCounter();
 			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
 
-			
-			//Center the camera over the dot
-			if (abs(2*camera.x - p1->position.x) >= boundingBox.x) {
-				targetX = p1->position.x - SCREEN_WIDTH / 2 + 25;
-			}
-
-			camera.x = targetX * (1.0f - 0.96f) + camera.x * 0.96f;
-			camera.y = p1->position.y - SCREEN_HEIGHT / 2 + 25;
+			moveCamera(&camera, p1, boundingBox, &targetX);
 			
 
-			//Keep the camera in bounds
-			if (camera.x < 0)
-			{
-				camera.x = 0;
-			}
-			if (camera.y < 0)
-			{
-				camera.y = 0;
-			}
-			if (camera.x > LEVEL_WIDTH - camera.w)
-			{
-				camera.x = LEVEL_WIDTH - camera.w;
-			}
-			if (camera.y > LEVEL_HEIGHT - camera.h)
-			{
-				camera.y = LEVEL_HEIGHT - camera.h;
-			}
 
 
 
+			// Handle mouse and keyboard input
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
 				quit = handleInput(&e, p1,p2);
@@ -125,61 +106,22 @@ int main(int argc, char* args[])
 			p1->targetVelocity = { 0,0 };
 			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-			if (currentKeyStates[SDL_SCANCODE_UP])
-			{
-				std::cout << "UP\n";
-				p1->targetVelocity.y = -maxSpeed;
-			}
-
-			if (currentKeyStates[SDL_SCANCODE_DOWN])
-			{
-				std::cout << "DOWN\n";
-				p1->targetVelocity.y = maxSpeed;
-			}
-
-			if (currentKeyStates[SDL_SCANCODE_LEFT])
-			{
-				std::cout << "LEFT\n";
-				p1->targetVelocity.x = -maxSpeed;
-			}
-
-			if (currentKeyStates[SDL_SCANCODE_RIGHT])
-			{
-				std::cout << "RIGHT\n";
-				p1->targetVelocity.x = maxSpeed;
-			}
-			if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
-			{
-				p1->targetVelocity.y = -maxSpeed;
-				p1->targetVelocity.x = -maxSpeed;
-			}
-			if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
-			{
-				p1->targetVelocity.y = -maxSpeed;
-				p1->targetVelocity.x = maxSpeed;
-			}
-			if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
-			{
-				p1->targetVelocity.y = maxSpeed;
-				p1->targetVelocity.x = -maxSpeed;
-			}
-			if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
-			{
-				p1->targetVelocity.y = maxSpeed;
-				p1->targetVelocity.x = maxSpeed;
-			}
+			handleKeyboardInput(currentKeyStates, p1, maxSpeed);
 			
+
+
 			p1->Move();
 
-			//Apply the image
-			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-			SDL_RenderClear(gRenderer);
+			// Apply the image (??)
+			// i dont remember what its for
+			// probably useless, will keep it just in case it has a magic meaning
+			//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+			//SDL_RenderClear(gRenderer);
 
 			
 
 			int numberOfColumns = LEVEL_WIDTH / 25;
 			int numberOfRows = LEVEL_HEIGHT / 25;
-
 			for (int i = 0; i < numberOfRows; i++) {
 				std::string line = map.at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
@@ -187,15 +129,10 @@ int main(int argc, char* args[])
 				}
 			}
 
-			//Render red filled quad
-
-			SDL_Rect fillRect = { p1->position.x-camera.x, p1->position.y-camera.y, 50, 50 };
-			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0xFF, 0xFF);
-			SDL_RenderFillRect(gRenderer, &fillRect);
-
-			DrawCircle(gRenderer, 400, 300, 10);
-			DrawCircle(gRenderer, 400, 300, 75);
-
+			// Draw players
+			// P1
+			drawPlayer(gRenderer, playerTexture, p1->position.x - camera.x, p1->position.y - camera.y);	
+			//P2
 			DrawCircle(gRenderer, p2->position.x, p2->position.y, 25);
 
 			//Update screen
@@ -283,7 +220,7 @@ void close()
 	SDL_Quit();
 }
 
-
+// probably unnecessary for the player but I will keep it in case I need it later
 void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius)
 {
 	SDL_Color color;

@@ -24,3 +24,49 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2 ){
 	}
 	return quit;
 }
+
+void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, int maxSpeed) {
+	if (currentKeyStates[SDL_SCANCODE_UP])
+	{
+		std::cout << "UP\n";
+		p1->targetVelocity.y = -maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_DOWN])
+	{
+		std::cout << "DOWN\n";
+		p1->targetVelocity.y = maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		std::cout << "LEFT\n";
+		p1->targetVelocity.x = -maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		std::cout << "RIGHT\n";
+		p1->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		p1->targetVelocity.y = -maxSpeed;
+		p1->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		p1->targetVelocity.y = -maxSpeed;
+		p1->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		p1->targetVelocity.y = maxSpeed;
+		p1->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		p1->targetVelocity.y = maxSpeed;
+		p1->targetVelocity.x = maxSpeed;
+	}
+}
