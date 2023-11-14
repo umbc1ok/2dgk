@@ -11,6 +11,8 @@ enum KeyPressSurfaces
 	KEY_PRESS_SURFACE_TOTAL
 };
 
+
+// mouse input only
 bool handleInput(SDL_Event* e, Player* p1, Player* p2 ){
 	bool quit = false;
 	if (e->type == SDL_QUIT)

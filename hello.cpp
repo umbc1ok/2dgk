@@ -87,39 +87,38 @@ int main(int argc, char* args[])
 		float cameraSmooth = 0.93f;
 		while (!quit) {
 
-			//counting frame time
+			///////////////////////
+			// FRAMETIME COUNTER //
+			///////////////////////
 			PREVIOUS = CURRENT;
 			CURRENT = SDL_GetPerformanceCounter();
 			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
 
+			/////////////////////
+			// CAMERA MOVEMENT //
+			/////////////////////
 			moveCamera(&camera, p1, boundingBox, &targetX);
 			
+			/////////////////////////////////////
+			// Handle mouse and keyboard input //
+			/////////////////////////////////////
 
-
-
-
-			// Handle mouse and keyboard input
-			bool pushed = false;
-			while (SDL_PollEvent(&e) != 0) {
-				quit = handleInput(&e, p1,p2);
-			}
+			// KEYBOARD (PLAYER 1)
 			p1->targetVelocity = { 0,0 };
 			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 			handleKeyboardInput(currentKeyStates, p1, maxSpeed);
-			
-
-
 			p1->Move();
-
-			// Apply the image (??)
-			// i dont remember what its for
-			// probably useless, will keep it just in case it has a magic meaning
-			//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-			//SDL_RenderClear(gRenderer);
+			// MOUSE (PLAYER 2)
+			bool pushed = false;
+			while (SDL_PollEvent(&e) != 0) {
+				quit = handleInput(&e, p1,p2);
+			}
 
 			
-
+			/////////////////
+			// MAP DRAWING //
+			/////////////////
 			int numberOfColumns = LEVEL_WIDTH / 25;
 			int numberOfRows = LEVEL_HEIGHT / 25;
 			for (int i = 0; i < numberOfRows; i++) {
@@ -129,13 +128,17 @@ int main(int argc, char* args[])
 				}
 			}
 
-			// Draw players
+			//////////////////
+			// Draw players //
+			//////////////////
 			// P1
 			drawPlayer(gRenderer, playerTexture, p1->position.x - camera.x, p1->position.y - camera.y);	
 			//P2
 			DrawCircle(gRenderer, p2->position.x, p2->position.y, 25);
 
-			//Update screen
+			///////////////////
+			// Update screen //
+			///////////////////
 			SDL_RenderPresent(gRenderer);
 			if (desiredFrameTime > deltaTime) // If the desired frame delay is greater than the deltaTime
 			{
