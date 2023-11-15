@@ -19,15 +19,17 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2 ){
 	{
 		quit = true;
 	}
-	else if (e->type == SDL_MOUSEMOTION) {
+	/*else if (e->type == SDL_MOUSEMOTION) {
 		SDL_GetMouseState(&p2->position.x, &p2->position.y);
 		std::string log = "Mouse at:" + std::to_string(p2->position.x) + "," + std::to_string(p2->position.x);
 		std::cout << log << std::endl;
-	}
+	}*/
 	return quit;
 }
 
-void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, int maxSpeed) {
+void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, Player* p2, int maxSpeed) {
+
+	//PLAYER 1
 	if (currentKeyStates[SDL_SCANCODE_UP])
 	{
 		std::cout << "UP\n";
@@ -71,4 +73,52 @@ void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, int maxSpeed
 		p1->targetVelocity.y = maxSpeed;
 		p1->targetVelocity.x = maxSpeed;
 	}
+
+
+	// PLAYER 2
+	if (currentKeyStates[SDL_SCANCODE_W])
+	{
+		std::cout << "UP\n";
+		p2->targetVelocity.y = -maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_S])
+	{
+		std::cout << "DOWN\n";
+		p2->targetVelocity.y = maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_A])
+	{
+		std::cout << "LEFT\n";
+		p2->targetVelocity.x = -maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_D])
+	{
+		std::cout << "RIGHT\n";
+		p2->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_W] && currentKeyStates[SDL_SCANCODE_A])
+	{
+		p2->targetVelocity.y = -maxSpeed;
+		p2->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_W] && currentKeyStates[SDL_SCANCODE_D])
+	{
+		p2->targetVelocity.y = -maxSpeed;
+		p2->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_S] && currentKeyStates[SDL_SCANCODE_A])
+	{
+		p2->targetVelocity.y = maxSpeed;
+		p2->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_S] && currentKeyStates[SDL_SCANCODE_D])
+	{
+		p2->targetVelocity.y = maxSpeed;
+		p2->targetVelocity.x = maxSpeed;
+	}
+
+
 }

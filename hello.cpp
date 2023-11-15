@@ -97,7 +97,7 @@ int main(int argc, char* args[])
 			/////////////////////
 			// CAMERA MOVEMENT //
 			/////////////////////
-			moveCamera(&camera, p1, boundingBox, &targetX);
+			moveCamera(&camera, p1, p2, boundingBox, &targetX);
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
@@ -105,10 +105,12 @@ int main(int argc, char* args[])
 
 			// KEYBOARD (PLAYER 1)
 			p1->targetVelocity = { 0,0 };
+			p2->targetVelocity = { 0,0 };
 			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-			handleKeyboardInput(currentKeyStates, p1, maxSpeed);
+			handleKeyboardInput(currentKeyStates, p1,p2, maxSpeed);
 			p1->Move();
+			p2->Move();
 			// MOUSE (PLAYER 2)
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
@@ -134,7 +136,7 @@ int main(int argc, char* args[])
 			// P1
 			drawPlayer(gRenderer, playerTexture, p1->position.x - camera.x, p1->position.y - camera.y);	
 			//P2
-			DrawCircle(gRenderer, p2->position.x, p2->position.y, 25);
+			DrawCircle(gRenderer, p2->position.x - camera.x, p2->position.y - camera.y, 25);
 
 			///////////////////
 			// Update screen //
