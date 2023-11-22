@@ -7,13 +7,15 @@ void moveCamera(SDL_Rect* camera, Player* p1, Player* p2, Vector2i boundingBox, 
 
 
 void moveCamera(SDL_Rect* camera, Player* p1, Player* p2, Vector2i boundingBox, int* targetX) {
-
+	/*
 	if (abs(camera->x + SCREEN_WIDTH / 2 - p1->position.x - 25) >= boundingBox.x
 		|| abs(camera->x + SCREEN_WIDTH / 2 - p2->position.x) >= boundingBox.x) { // so far it's a circle so we dont have to subtract 25
 		*targetX = (p1->position.x + 25 + p2->position.x) / 2.0f - SCREEN_WIDTH / 2;				     // same here with the +25
 	}
 
 	camera->x = *targetX * (1.0f - CAMERA_SMOOTH) + camera->x * CAMERA_SMOOTH;
+	*/
+	camera->x = ((p1->position.x - SCREEN_WIDTH / 2 + 25) + (p2->position.x - SCREEN_WIDTH / 2 + 25)) / 2.0f;
 	camera->y = ((p1->position.y - SCREEN_HEIGHT / 2 + 25) + (p2->position.y - SCREEN_HEIGHT / 2 + 25)) / 2.0f;
 
 	keepCameraInBounds(camera);

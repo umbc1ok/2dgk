@@ -65,7 +65,7 @@ void Player::fixPosition()
 		targetVelocity.y = 0;
 	}
 	if (screenPosition.x + 50 > SCREEN_WIDTH) {
-		position.x += screenPosition.x - SCREEN_WIDTH -50; //move the player by how much he was out of the box
+		position.x -= screenPosition.x - SCREEN_WIDTH; //move the player by how much he was out of the box
 		screenPosition.x = SCREEN_WIDTH - 50;
 		targetVelocity.x = 0;
 	}

@@ -31,6 +31,7 @@ SDL_Renderer* gRenderer = NULL;
 SDL_Texture* woodTexture = NULL;
 SDL_Texture* grassTexture = NULL;
 SDL_Texture* playerTexture = NULL;
+SDL_Texture* player2Texture = NULL;
 
 
 
@@ -79,6 +80,8 @@ int main(int argc, char* args[])
 		loadMedia(arr2, &grassTexture, gRenderer);
 		char arr3[] = "player.png";
 		loadMedia(arr3, &playerTexture, gRenderer);
+		char arr4[] = "player2.png";
+		loadMedia(arr4, &player2Texture, gRenderer);
 
 
 		std::vector<std::string> map = loadMapFromFile("map.txt");
@@ -97,9 +100,9 @@ int main(int argc, char* args[])
 			/////////////////////
 			// CAMERA MOVEMENT //
 			/////////////////////
+			moveCamera(&camera, p1, p2, boundingBox, &targetX);
 			p1->fixPosition();
 			p2->fixPosition();
-			moveCamera(&camera, p1, p2, boundingBox, &targetX);
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
@@ -138,7 +141,7 @@ int main(int argc, char* args[])
 			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
 			drawPlayer(gRenderer, playerTexture, p1->screenPosition.x, p1->screenPosition.y);
 			//P2
-			drawPlayer(gRenderer, playerTexture, p2->screenPosition.x, p2->screenPosition.y);
+			drawPlayer(gRenderer, player2Texture, p2->screenPosition.x, p2->screenPosition.y);
 			p1->Move();
 			p2->Move();
 			///////////////////
