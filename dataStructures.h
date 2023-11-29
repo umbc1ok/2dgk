@@ -8,3 +8,6 @@ struct Vector2i {
 struct Vector4f {
 	int x, y, z, a;
 };
+struct Vector3f {
+	int x, y, z;
+};

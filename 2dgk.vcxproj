@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="dataStructures.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="input.h" />

@@ -46,6 +46,19 @@ int main(int argc, char* args[])
 	//Setting up players
 	Player* p1 = new Player();
 	Player* p2 = new Player();
+	Player* p3 = new Player();
+	p1->velocity.x = 5;
+	p1->velocity.y = 5;
+	p2->velocity.x = -5;
+	p2->velocity.y = -5;
+	p3->velocity.x = -5;
+	p3->velocity.y = -5;
+
+	p1->position = { 100,100 };
+	p2->position = { 200,300 };
+	p3->position = { 400,300 };
+
+
 
 
 	// camera coordinates are basically the top left corner of the window, not the center
@@ -100,17 +113,17 @@ int main(int argc, char* args[])
 			/////////////////////
 			// CAMERA MOVEMENT //
 			/////////////////////
-			moveCamera(&camera, p1, p2, boundingBox, &targetX);
-			p1->fixPosition();
-			p2->fixPosition();
+			//moveCamera(&camera, p1, p2, boundingBox, &targetX);
+			//p1->fixPosition();
+			//p2->fixPosition();
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
 			/////////////////////////////////////
 
 			// KEYBOARD (PLAYER 1)
-			p1->targetVelocity = { 0,0 };
-			p2->targetVelocity = { 0,0 };
+			//p1->targetVelocity = { 0,0 };
+			//p2->targetVelocity = { 0,0 };
 			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 			handleKeyboardInput(currentKeyStates, p1,p2, maxSpeed);
@@ -137,13 +150,23 @@ int main(int argc, char* args[])
 			// Draw players //
 			//////////////////
 			// P1
-			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
-			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
-			drawPlayer(gRenderer, playerTexture, p1->screenPosition.x, p1->screenPosition.y);
-			//P2
-			drawPlayer(gRenderer, player2Texture, p2->screenPosition.x, p2->screenPosition.y);
+			p1->checkCollision(*p2);
+			p1->checkCollision(*p3);
+			p2->checkCollision(*p1);
+			p2->checkCollision(*p3);
+			p3->checkCollision(*p1);
+			p3->checkCollision(*p2);
 			p1->Move();
 			p2->Move();
+			p3->Move();
+			//p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
+			//p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
+			DrawCircle(gRenderer, p1->position.x, p1->position.y,p1->radius);
+			DrawCircle(gRenderer, p2->position.x, p2->position.y,p2->radius);
+			DrawCircle(gRenderer, p3->position.x, p3->position.y,p3->radius);
+			//drawPlayer(gRenderer, playerTexture, p1->screenPosition.x, p1->screenPosition.y);
+			//P2
+			//drawPlayer(gRenderer, player2Texture, p2->screenPosition.x, p2->screenPosition.y);
 			///////////////////
 			// Update screen //
 			///////////////////
