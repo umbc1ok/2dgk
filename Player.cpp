@@ -50,11 +50,25 @@ void Player::checkCollision(Player other) {
 }
 
 void Player::wallCollision() {
-	if (position.x + radius * 2> SCREEN_WIDTH || position.x - radius < 0) {
-		velocity.x *= -1;
+	if (position.x + radius > SCREEN_WIDTH)  {
+		if (velocity.x > 0) {
+			velocity.x *= -1;
+		}
 	}
-	if (position.y + radius > SCREEN_HEIGHT || position.y - radius < 0) {
-		velocity.y *= -1;
+	else if(position.x - radius < 0) {
+		if (velocity.x < 0) {
+			velocity.x *= -1;
+		}
+	}
+	if (position.y + radius > SCREEN_HEIGHT) {
+		if (velocity.y > 0) {
+			velocity.y *= -1;
+		}
+	}
+	else if (position.y - radius < 0) {
+		if (velocity.y < 0) {
+			velocity.y *= -1;
+		}
 	}
 
 }
@@ -80,8 +94,8 @@ void Player::Move()
 	// THE 25's are assuming that players dimensions are 50x50 pixels
 	
 
-	wallCollision();
 
+	wallCollision();
 
 	//if (screenPosition.x + 50 + int(round(velocity.x)) <= SCREEN_WIDTH && screenPosition.x + int(round(velocity.x)) >= 0) {
 		position.x += int(round(velocity.x));
@@ -89,6 +103,8 @@ void Player::Move()
 	//if (screenPosition.y + 50 + int(round(velocity.y)) <= SCREEN_HEIGHT && screenPosition.y + int(round(velocity.y)) >= 0) {
 		position.y += int(round(velocity.y));
 	//}
+		
+
 
 	
 
@@ -137,6 +153,7 @@ void Player::separate(Player other)
 		this->position.x -= overlap * (this->position.x - other.position.x) / distance;
 		this->position.y -= overlap * (this->position.y - other.position.y) / distance;
 	}
+
 
 }
 
