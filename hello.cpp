@@ -47,16 +47,24 @@ int main(int argc, char* args[])
 	Player* p1 = new Player();
 	Player* p2 = new Player();
 	Player* p3 = new Player();
+	Player* p4 = new Player();
+	Player* p5 = new Player();
 	p1->velocity.x = 5;
 	p1->velocity.y = 5;
 	p2->velocity.x = -5;
 	p2->velocity.y = -5;
 	p3->velocity.x = -5;
 	p3->velocity.y = -5;
+	p4->velocity.x = -5;
+	p4->velocity.y = -5;
+	p5->velocity.x = -5;
+	p5->velocity.y = -5;
 
-	p1->position = { 100,100 };
-	p2->position = { 200,300 };
-	p3->position = { 400,300 };
+	p1->position = { rand() % 500 + 50,rand() % 500 + 50 };
+	p2->position = { rand() % 500 + 50,rand() % 500 + 50 };
+	p3->position = { rand() % 500 + 50,rand() % 500 + 50 };
+	p4->position = { rand()% 500 +50,rand() % 500 + 50 };
+	p5->position = { rand()% 500 +50,rand() % 500 + 50 };
 
 
 
@@ -101,6 +109,9 @@ int main(int argc, char* args[])
 
 		int targetX = 0;
 		float cameraSmooth = 0.93f;
+		bool collisions = true;
+		bool separation = true;
+
 		while (!quit) {
 
 			///////////////////////
@@ -126,7 +137,7 @@ int main(int argc, char* args[])
 			//p2->targetVelocity = { 0,0 };
 			int maxSpeed = 10;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-			handleKeyboardInput(currentKeyStates, p1,p2, maxSpeed);
+			handleKeyboardInput(currentKeyStates, collisions,separation);
 			// MOUSE (PLAYER 2)
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
@@ -150,20 +161,81 @@ int main(int argc, char* args[])
 			// Draw players //
 			//////////////////
 			// P1
-			p1->checkCollision(*p2);
-			p1->checkCollision(*p3);
-			p2->checkCollision(*p1);
-			p2->checkCollision(*p3);
-			p3->checkCollision(*p1);
-			p3->checkCollision(*p2);
+
+			if (collisions) {
+
+				p1->checkCollision(*p2);
+				p1->checkCollision(*p3);
+				p1->checkCollision(*p4);
+				p1->checkCollision(*p5);
+
+
+				p2->checkCollision(*p1);
+				p2->checkCollision(*p3);
+				p2->checkCollision(*p4);
+				p2->checkCollision(*p5);
+
+				p3->checkCollision(*p1);
+				p3->checkCollision(*p2);
+				p3->checkCollision(*p4);
+				p3->checkCollision(*p5);
+
+				p4->checkCollision(*p1);
+				p4->checkCollision(*p2);
+				p4->checkCollision(*p3);
+				p4->checkCollision(*p5);
+
+				p5->checkCollision(*p1);
+				p5->checkCollision(*p2);
+				p5->checkCollision(*p4);
+				p5->checkCollision(*p3);
+			}
+			
 			p1->Move();
 			p2->Move();
 			p3->Move();
+			p4->Move();
+			p5->Move();
+			
+			if (separation) {
+				p1->separate(*p2);
+				p1->separate(*p3);
+				p1->separate(*p4);
+				p1->separate(*p5);
+
+
+				p2->separate(*p1);
+				p2->separate(*p3);
+				p2->separate(*p4);
+				p2->separate(*p5);
+
+				p3->separate(*p1);
+				p3->separate(*p2);
+				p3->separate(*p4);
+				p3->separate(*p5);
+
+				p4->separate(*p1);
+				p4->separate(*p2);
+				p4->separate(*p3);
+				p4->separate(*p5);
+
+				p5->separate(*p1);
+				p5->separate(*p2);
+				p5->separate(*p4);
+				p5->separate(*p3);
+			}
+			
+
+			
+
+
 			//p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
 			//p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
 			DrawCircle(gRenderer, p1->position.x, p1->position.y,p1->radius);
 			DrawCircle(gRenderer, p2->position.x, p2->position.y,p2->radius);
 			DrawCircle(gRenderer, p3->position.x, p3->position.y,p3->radius);
+			DrawCircle(gRenderer, p4->position.x, p4->position.y,p4->radius);
+			DrawCircle(gRenderer, p5->position.x, p5->position.y,p5->radius);
 			//drawPlayer(gRenderer, playerTexture, p1->screenPosition.x, p1->screenPosition.y);
 			//P2
 			//drawPlayer(gRenderer, player2Texture, p2->screenPosition.x, p2->screenPosition.y);

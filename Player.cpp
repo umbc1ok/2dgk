@@ -25,25 +25,25 @@ Player::~Player()
 
 void Player::checkCollision(Player other) {
 	float xDistance = abs((this->position.x + this->radius / 2.0f) - (other.position.x + other.radius / 2.0f));
-	float yDistance = abs((this->position.y + this->radius / 2) - (other.position.y + other.radius / 2));
+	float yDistance = abs((this->position.y + this->radius / 2.0f) - (other.position.y + other.radius / 2.0f));
 	
 	float distance = sqrt(xDistance * xDistance + yDistance * yDistance);
 
-	if (distance < radius * 2) {
+	if (distance < radius + other.radius) {
 		Vector2f separation;
 		separation.x = this->position.x - other.position.x;
 		separation.y = this->position.y - other.position.y;
 
-		float factor = (distance) / (this->radius + other.radius - distance);
+		float factor = (this->radius + other.radius - distance) / distance;
 		separation.x *= factor;
 		separation.y *= factor;
 		
 		float sepLength = sqrt(separation.x * separation.x + separation.y * separation.y);
 		separation.x /= sepLength;
 		separation.y /= sepLength;
-		Vector2i newVelocity;
-		newVelocity.x = velocity.x - (2 * separation.x * velocity.x) * separation.x;
-		newVelocity.y = velocity.y - (2 * separation.y * velocity.y) * separation.y;
+		Vector2f newVelocity;
+		newVelocity.x = velocity.x - 2 * (separation.x * velocity.x + separation.y * velocity.y) * separation.x;
+		newVelocity.y = velocity.y - (2 * (separation.x * velocity.x + separation.y * velocity.y)) * separation.y;
 		velocity.x = newVelocity.x;
 		velocity.y = newVelocity.y;
 	}
@@ -122,5 +122,21 @@ void Player::fixPosition()
 		screenPosition.y = SCREEN_HEIGHT - 50;
 		targetVelocity.y = 0;
 	}
+}
+
+void Player::separate(Player other)
+{
+
+	float xDistance = abs((this->position.x + this->radius / 2.0f) - (other.position.x + other.radius / 2.0f));
+	float yDistance = abs((this->position.y + this->radius / 2) - (other.position.y + other.radius / 2));
+
+	float distance = sqrt(xDistance * xDistance + yDistance * yDistance);
+
+	if (distance < radius + other.radius) {
+		float overlap = 0.5f * ( distance - radius - other.radius);
+		this->position.x -= overlap * (this->position.x - other.position.x) / distance;
+		this->position.y -= overlap * (this->position.y - other.position.y) / distance;
+	}
+
 }
 
