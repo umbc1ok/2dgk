@@ -27,29 +27,98 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2 ){
 	return quit;
 }
 
-void handleKeyboardInput(const Uint8* currentKeyStates, bool& collisions, bool& separation) {
+void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, Player* p2, int maxSpeed) {
 
 	//PLAYER 1
-	if (currentKeyStates[SDL_SCANCODE_C])
+	if (currentKeyStates[SDL_SCANCODE_UP])
 	{
-		collisions = 1;
-		std::cout << "Collisions are now " << collisions << std::endl;
+		std::cout << "UP\n";
+		p1->targetVelocity.y = -maxSpeed;
 	}
 
-	if (currentKeyStates[SDL_SCANCODE_V])
+	if (currentKeyStates[SDL_SCANCODE_DOWN])
 	{
-		collisions = 0;
-		std::cout << "Collisions are now " << collisions << std::endl;
+		std::cout << "DOWN\n";
+		p1->targetVelocity.y = maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		std::cout << "LEFT\n";
+		p1->targetVelocity.x = -maxSpeed;
+	}
+
+	if (currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		std::cout << "RIGHT\n";
+		p1->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		p1->targetVelocity.y = -maxSpeed;
+		p1->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		p1->targetVelocity.y = -maxSpeed;
+		p1->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
+	{
+		p1->targetVelocity.y = maxSpeed;
+		p1->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
+	{
+		p1->targetVelocity.y = maxSpeed;
+		p1->targetVelocity.x = maxSpeed;
+	}
+
+
+	// PLAYER 2
+	if (currentKeyStates[SDL_SCANCODE_W])
+	{
+		std::cout << "UP\n";
+		p2->targetVelocity.y = -maxSpeed;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_S])
 	{
-		separation = 1;
-		std::cout << "Separations is now " << separation << std::endl;
+		std::cout << "DOWN\n";
+		p2->targetVelocity.y = maxSpeed;
 	}
+
+	if (currentKeyStates[SDL_SCANCODE_A])
+	{
+		std::cout << "LEFT\n";
+		p2->targetVelocity.x = -maxSpeed;
+	}
+
 	if (currentKeyStates[SDL_SCANCODE_D])
 	{
-		separation = 0;
-		std::cout << "Separations is now " << separation << std::endl;
+		std::cout << "RIGHT\n";
+		p2->targetVelocity.x = maxSpeed;
 	}
+	if (currentKeyStates[SDL_SCANCODE_W] && currentKeyStates[SDL_SCANCODE_A])
+	{
+		p2->targetVelocity.y = -maxSpeed;
+		p2->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_W] && currentKeyStates[SDL_SCANCODE_D])
+	{
+		p2->targetVelocity.y = -maxSpeed;
+		p2->targetVelocity.x = maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_S] && currentKeyStates[SDL_SCANCODE_A])
+	{
+		p2->targetVelocity.y = maxSpeed;
+		p2->targetVelocity.x = -maxSpeed;
+	}
+	if (currentKeyStates[SDL_SCANCODE_S] && currentKeyStates[SDL_SCANCODE_D])
+	{
+		p2->targetVelocity.y = maxSpeed;
+		p2->targetVelocity.x = maxSpeed;
+	}
+
+
 }

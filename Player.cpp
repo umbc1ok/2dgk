@@ -13,7 +13,7 @@ Player::Player()
 	Player::targetVelocity.y = 0;
 	Player::screenPosition.x = 0;
 	Player::screenPosition.y = 0;
-	Player::radius = 30.0f;
+	Player::radius = 10;
 
 }
 
@@ -50,7 +50,7 @@ void Player::checkCollision(Player other) {
 }
 
 void Player::wallCollision() {
-	if (position.x + radius > SCREEN_WIDTH)  {
+	if (position.x + radius > LEVEL_WIDTH)  {
 		if (velocity.x > 0) {
 			velocity.x *= -1;
 		}
@@ -60,7 +60,7 @@ void Player::wallCollision() {
 			velocity.x *= -1;
 		}
 	}
-	if (position.y + radius > SCREEN_HEIGHT) {
+	if (position.y + radius > LEVEL_HEIGHT) {
 		if (velocity.y > 0) {
 			velocity.y *= -1;
 		}
@@ -83,30 +83,20 @@ void Player::updateScreenPosition(int x, int y) {
 
 void Player::Move()
 {
-	/*
 	float smooth = 0.94;
 	// ten czas jest bez sensu, nie wiem jak to inaczej zrobic, ale to na pewno jest glupie
 	velocity.x = targetVelocity.x * (1.0f - smooth) + velocity.x * smooth;
 	velocity.y = targetVelocity.y * (1.0f - smooth) + velocity.y * smooth;
 
-	*/
+
 	// CHECKING IF PLAYER IS NOT ESCAPING THE SCREEN
 	// THE 25's are assuming that players dimensions are 50x50 pixels
-	
-
-
-	wallCollision();
-
-	//if (screenPosition.x + 50 + int(round(velocity.x)) <= SCREEN_WIDTH && screenPosition.x + int(round(velocity.x)) >= 0) {
+	if (screenPosition.x + radius*2 + int(round(velocity.x)) <= SCREEN_WIDTH && screenPosition.x + int(round(velocity.x)) >= 0) {
 		position.x += int(round(velocity.x));
-	//}
-	//if (screenPosition.y + 50 + int(round(velocity.y)) <= SCREEN_HEIGHT && screenPosition.y + int(round(velocity.y)) >= 0) {
+	}
+	if (screenPosition.y + radius*2 + int(round(velocity.y)) <= SCREEN_HEIGHT && screenPosition.y + int(round(velocity.y)) >= 0) {
 		position.y += int(round(velocity.y));
-	//}
-		
-
-
-	
+	}
 
 }
 

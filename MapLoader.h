@@ -3,6 +3,7 @@
 #include <vector>
 #include <SDL.h>
 #include <SDL_image.h>
+#include "definitions.h"
 
 std::vector<std::string> loadMapFromFile(std::string fileName);
 void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture);
@@ -22,7 +23,7 @@ std::vector<std::string> loadMapFromFile(std::string fileName) {
 	return map;
 }
 void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture) {
-	SDL_Rect fillRect = { x, y, 25, 25 };
+	SDL_Rect fillRect = { x, y, TILE_SIZE, TILE_SIZE };
 	if (sign == '=') {
 		SDL_SetRenderDrawColor(gRenderer, 173, 216, 230, 0xFF);
 		SDL_RenderFillRect(gRenderer, &fillRect);
