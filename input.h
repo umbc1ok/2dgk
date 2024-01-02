@@ -78,25 +78,25 @@ void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, Player* p2, 
 	// PLAYER 2
 	if (currentKeyStates[SDL_SCANCODE_W])
 	{
-		std::cout << "UP\n";
+		//std::cout << "UP\n";
 		p2->targetVelocity.y = -maxSpeed;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_S])
 	{
-		std::cout << "DOWN\n";
+		//std::cout << "DOWN\n";
 		p2->targetVelocity.y = maxSpeed;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_A])
 	{
-		std::cout << "LEFT\n";
+		//std::cout << "LEFT\n";
 		p2->targetVelocity.x = -maxSpeed;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_D])
 	{
-		std::cout << "RIGHT\n";
+		//std::cout << "RIGHT\n";
 		p2->targetVelocity.x = maxSpeed;
 	}
 	if (currentKeyStates[SDL_SCANCODE_W] && currentKeyStates[SDL_SCANCODE_A])

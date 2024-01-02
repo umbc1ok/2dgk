@@ -12,8 +12,11 @@ and may not be redistributed without written permission.*/
 #include "definitions.h"
 #include "camera.h"
 #include "collisions.h"
+#include "scoreboard.h"
 
 
+
+float scale = 1.0f;
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
 
@@ -39,6 +42,8 @@ SDL_Texture* player2Texture = NULL;
 bool init();
 void close();
 void DrawCircle(SDL_Renderer* renderer, int centreX, int centreY, int radius);
+void DrawQuad(SDL_Renderer* renderer, int x, int y, int width, int height);
+void DrawDottedLine(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
 
 
 
@@ -50,16 +55,20 @@ int main(int argc, char* args[])
 	Player* p1 = new Player();
 	Player* p2 = new Player();
 
+	Scoreboard* scoreboard = new Scoreboard();
 
+
+	//p1->radius = p1->radius / 2;
 	p1->position = { rand() % 750 + 50,rand() % 500 + 50 };
 	p2->position = { rand() % 750 + 50,rand() % 500 + 50 };
 
-
+	std::vector<Vector2i> spawnPoints;
+	spawnPoints.push_back({ 50,50 });
 
 
 
 	// camera coordinates are basically the top left corner of the window, not the center
-	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	// boundingbox of the camera
 	Vector2i boundingBox = { 50,50 };
 
@@ -100,9 +109,24 @@ int main(int argc, char* args[])
 		float cameraSmooth = 0.93f;
 		bool collisions = true;
 		bool separation = true;
+		int currentMap = 0;
 
 		while (!quit) {
-
+			if (currentMap != scoreboard->checkCurrentMap()) {
+				currentMap = scoreboard->checkCurrentMap();
+				p1->position = { rand() % 750 + 50,rand() % 500 + 50 };
+				p2->position = { rand() % 750 + 50,rand() % 500 + 50 };
+				std::cout << currentMap << std::endl;
+				if (currentMap == 1) {
+					map = loadMapFromFile("map3.txt");
+				}
+				else if (currentMap == 2) {
+					map = loadMapFromFile("map4.txt");
+				}
+				else if (currentMap == 0) {
+					map = loadMapFromFile("map2.txt");
+				}
+			}
 			///////////////////////
 			// FRAMETIME COUNTER //
 			///////////////////////
@@ -113,16 +137,8 @@ int main(int argc, char* args[])
 			/////////////////////
 			// CAMERA MOVEMENT //
 			/////////////////////
+
 			moveCamera(&camera, p1, p2, boundingBox, &targetX);
-			p1->fixPosition();
-			p2->fixPosition();
-			/*
-			p3->fixPosition();
-			p4->fixPosition();
-			p5->fixPosition();
-			p6->fixPosition();
-			p7->fixPosition();
-			*/
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
@@ -159,8 +175,8 @@ int main(int argc, char* args[])
 			//////////////////
 			// P1
 			
-			collideWithLabirynthWalls(p1, map);
-			//collideWithLabirynthWalls(p2, map);
+			collideWithLabirynthWalls(p1, map, true, scoreboard);
+			collideWithLabirynthWalls(p2, map, true, scoreboard);
 
 
 
@@ -171,6 +187,7 @@ int main(int argc, char* args[])
 			
 			p1->Move();
 			p2->Move();
+
 			
 			if (separation) {
 				p1->separate(*p2);
@@ -179,9 +196,10 @@ int main(int argc, char* args[])
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
 			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
-			DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius);
+			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2,p1->radius*2);
 			DrawCircle(gRenderer, p2->screenPosition.x, p2->screenPosition.y,p2->radius);
-
+			DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, 725-camera.x, 475 - camera.y);
+			DrawDottedLine(gRenderer, p2->screenPosition.x, p2->screenPosition.y, 725-camera.x, 475 - camera.y);
 			SDL_RenderPresent(gRenderer);
 			if (desiredFrameTime > deltaTime) // If the desired frame delay is greater than the deltaTime
 			{
@@ -288,6 +306,36 @@ void DrawCircle(SDL_Renderer* renderer, int x, int y, int radius)
 				SDL_RenderDrawPoint(renderer, x + dx, y + dy);
 			}
 		}
+	}
+}
+
+void DrawQuad(SDL_Renderer* renderer, int x, int y, int width, int height)
+{
+	x -= width / 2;
+	y -= height / 2;
+	SDL_Color color;
+	color.r = 255;
+	color.g = 255;
+	color.b = 255;
+	color.a = 255;
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_Rect rect = { x,y,width,height };
+	SDL_RenderDrawRect(renderer, &rect);
+}
+
+void DrawDottedLine(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
+	int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+	int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+	int err = dx + dy, e2;
+	int count = 0;
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	while (1) {
+		if (count < 10) { SDL_RenderDrawPoint(renderer, x0, y0); }
+		if (x0 == x1 && y0 == y1) break;
+		e2 = 2 * err;
+		if (e2 > dy) { err += dy; x0 += sx; }
+		if (e2 < dx) { err += dx; y0 += sy; }
+		count = (count + 1) % 20;
 	}
 }
 

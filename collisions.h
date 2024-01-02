@@ -5,18 +5,19 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "scoreboard.h"
 
 //currently the problem si that when I cross onto another tile, the collision is detected even if it's a corridor tile
 
 
 float clamp(float value, float min, float max);
-bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex);
-void collideWithLabirynthWalls(Player* player, std::vector<std::string> map);
+bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
+void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard scrb);
 void separate(Player* player, float tileX, float tileY, Vector2f closestPoint);
-bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex);
+bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
 
 //function for a circle colliding with a rectangluar wall hitbox
-void collideWithLabirynthWalls(Player* player, std::vector<std::string> map) {
+void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb) {
 	//find the tile that the player's center is in
 	int tileX = player->position.x / TILE_SIZE;
 	int tileY = player->position.y / TILE_SIZE;
@@ -27,19 +28,38 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map) {
 			//honestly copilot told me this condition, but idk how the hell it works, but it does
 			if (tileY + i >= 0 && tileY + i < map.size() && tileX + j >= 0 && tileX + j < map.at(0).size()) {
 				if (map[tileY + i][tileX + j] == '=') {
-					if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i)) {
-						std::cout << "get rect";
+					if (circle)
+					{
+						checkIfCircleAndRectOverlap(player, tileX + j, tileY + i,true);
 					}
-					//if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i)) {
-					//	std::cout << "it works";
-					//}
+					else
+					{
+						checkIfRectAndRectOverlap(player, tileX + j, tileY + i,true);
+					}
+				}
+				if (map[tileY + i][tileX + j] == 'w') {
+					if (circle)
+					{
+						if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, false)) {
+							scrb->win(1);
+							return;
+						}
+					}
+					else
+					{
+						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i,false)) {
+							scrb->win(2);
+							return;
+						}
+
+					}
 				}
 			}
 		}
 	// if they do, move the player by the separation vector
 }
 
-bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex) {
+bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide) {
 	Vector2f closestPoint;
 	closestPoint.x = clamp(player->position.x, tileXIndex * TILE_SIZE, tileXIndex * TILE_SIZE + TILE_SIZE);
 	closestPoint.y = clamp(player->position.y, tileYIndex * TILE_SIZE, tileYIndex * TILE_SIZE + TILE_SIZE);
@@ -48,8 +68,7 @@ bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex)
 	distance = sqrt(pow(player->position.x - closestPoint.x, 2) + pow(player->position.y - closestPoint.y, 2));
 	
 	if (distance < player->radius) {
-		separate(player, tileXIndex, tileYIndex, closestPoint);
-		std::cout << distance << std::endl;
+		if(collide) separate(player, tileXIndex, tileYIndex, closestPoint);
 		return true;
 	}
 	else {
@@ -57,7 +76,7 @@ bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex)
 	}
 }
 
-bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex) {
+bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide) {
 	float playerLeft = player->position.x - player->radius;
 	float playerRight = player->position.x + player->radius;
 	float playerTop = player->position.y - player->radius;
@@ -71,17 +90,24 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex) {
 	float top = playerBottom - tileYIndex * TILE_SIZE;
 	float bottom = tileYIndex * TILE_SIZE + TILE_SIZE - playerTop;
 
-	if (left < 0 || right < 0 || top < 0 || bottom < 0) {
+	if (left <= 0 || right <= 0 || top <= 0 || bottom <= 0) {
 		return false;
 	}
 	else {
-		Vector2f separation;
-		separation.x = left < right ? -left : right;
-		separation.y = top < bottom ? -top : bottom;
+		if(collide){
+			Vector2f separation;
+			separation.x = left < right ? -left : right;
+			separation.y = top < bottom ? -top : bottom;
 
-		separation.x < separation.y ? separation.y = 0 : separation.x = 0;
-		player->position.x += separation.x;
-		player->position.y += separation.y;
+			if (separation.x < separation.y) {
+				separation.y = 0;
+			}
+			else if (separation.x > separation.y) {
+				separation.x = 0;
+			}
+			player->position.x += separation.x;
+			player->position.y += separation.y;
+		}
 		return true;
 	}
 }
