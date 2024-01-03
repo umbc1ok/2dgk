@@ -34,7 +34,9 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 					}
 					else
 					{
-						checkIfRectAndRectOverlap(player, tileX + j, tileY + i, true);
+						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i, true)) {
+							return;
+						}
 					}
 				}
 				if (map[tileY + i][tileX + j] == 'w') {
@@ -79,7 +81,7 @@ bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex,
 
 bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide) {
 	float playerLeft = player->position.x - player->radius;
-	float playerRight = player->position.x + player->radius;
+	float playerRight = player->position.x  +player->radius;
 	float playerTop = player->position.y - player->radius;
 	float playerBottom = player->position.y + player->radius;
 
@@ -100,6 +102,7 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, b
 			separation.x = left < right ? -left : right;
 			separation.y = top < bottom ? -top : bottom;
 
+			
 			if (separation.x < separation.y) {
 				separation.y = 0;
 			}
@@ -107,15 +110,17 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, b
 				separation.x = 0;
 			}
 			if (separation.x != 0) {
-				player->velocity.x = 0;
 				player->targetVelocity.x = 0;
+				player->velocity.x = 0;
 			}
 			if (separation.y != 0) {
-				player->velocity.y = 0;
 				player->targetVelocity.y = 0;
+				player->velocity.y = 0;
 			}
+
 			player->position.x += separation.x;
 			player->position.y += separation.y;
+			
 		}
 
 		return true;

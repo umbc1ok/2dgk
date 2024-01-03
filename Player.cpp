@@ -90,7 +90,6 @@ void Player::Move()
 
 
 
-
 	// CHECKING IF PLAYER IS NOT ESCAPING THE SCREEN
 	// THE 25's are assuming that players dimensions are 50x50 pixels
 	if (screenPosition.x + radius*2 + int(round(velocity.x)) <= SCREEN_WIDTH && screenPosition.x + int(round(velocity.x)) >= 0) {

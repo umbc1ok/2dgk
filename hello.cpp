@@ -56,8 +56,8 @@ int main(int argc, char* args[])
 	Scoreboard* scoreboard = new Scoreboard();
 
 
-	p1->radius = 10;
-	p2->radius = 10;
+	p1->radius = 25;
+	p2->radius = 25;
 	std::vector<Vector2i> spawnPoints1;
 	std::vector<Vector2i> spawnPoints2;
 	std::vector<Vector2i> spawnPoints3;
@@ -77,7 +77,7 @@ int main(int argc, char* args[])
 	spawnPoints2.push_back({ 610,460 });
 	spawnPoints2.push_back({ 560,760 });
 
-	spawnPoints2.push_back({ 60,760 });
+	spawnPoints2.push_back({ 75,760 });
 	spawnPoints2.push_back({ 160,760 });
 
 	spawnPoints2.push_back({ 60,110 });
@@ -107,8 +107,8 @@ int main(int argc, char* args[])
 
 
 
-	p1->position = spawnPoints1.at(4);
-	p2->position = spawnPoints1.at(5);
+	p1->position = spawnPoints1.at(2);
+	p2->position = spawnPoints1.at(3);
 
 
 
@@ -151,7 +151,7 @@ int main(int argc, char* args[])
 		loadMedia(arr4, &player2Texture, gRenderer);
 
 
-		std::vector<std::string>* map = loadMapFromFile("map4.txt");
+		std::vector<std::string>* map = loadMapFromFile("map2.txt");
 
 		Vector2f treasureTile = randomizeTreasure(map);
 
