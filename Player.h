@@ -17,7 +17,8 @@ public:
 
 
 	void updateScreenPosition(int x, int y);
-	void Move();
+	void MoveX();
+	void MoveY();
 	void fixPosition();
 	void separate(Player other);
 };

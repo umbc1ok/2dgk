@@ -50,65 +50,68 @@ int main(int argc, char* args[])
 {
 	srand(time(NULL));
 	//Setting up players
+	// kwadrat
 	Player* p1 = new Player();
+	// kolo
 	Player* p2 = new Player();
 
 	Scoreboard* scoreboard = new Scoreboard();
 
 
-	p1->radius = 25;
-	p2->radius = 25;
+	p1->radius = 15;
+	p2->radius = 15;
 	std::vector<Vector2i> spawnPoints1;
 	std::vector<Vector2i> spawnPoints2;
 	std::vector<Vector2i> spawnPoints3;
-	spawnPoints1.push_back({ 60,110 });
-	spawnPoints1.push_back({ 110,60 });
+
+	spawnPoints1.push_back({ 70,120 });
+	spawnPoints1.push_back({ 120,70 });
 
 
-	spawnPoints1.push_back({ 1260,560 });
-	spawnPoints1.push_back({ 1110,560 });
+	spawnPoints1.push_back({ 1280,520 });
+	spawnPoints1.push_back({ 1110,520 });
 
-	spawnPoints1.push_back({ 560,210 });
-	spawnPoints1.push_back({ 1110,210 });
-
-
-
-
-	spawnPoints2.push_back({ 610,460 });
-	spawnPoints2.push_back({ 560,760 });
-
-	spawnPoints2.push_back({ 75,760 });
-	spawnPoints2.push_back({ 160,760 });
-
-	spawnPoints2.push_back({ 60,110 });
-	spawnPoints2.push_back({ 110,60 });
-
-	spawnPoints2.push_back({ 560,210 });
-	spawnPoints2.push_back({ 1110,210 });
-
-
-
-	spawnPoints3.push_back({1460,850 });
-	spawnPoints3.push_back({ 1610,800 });
-
-	spawnPoints3.push_back({ 610,460 });
-	spawnPoints3.push_back({ 560,760 });
-
-	spawnPoints3.push_back({ 60,760 });
-	spawnPoints3.push_back({ 160,760 });
-
-	spawnPoints3.push_back({ 60,110 });
-	spawnPoints3.push_back({ 110,60 });
-
-	spawnPoints3.push_back({ 560,210 });
-	spawnPoints3.push_back({ 1110,210 });
+	spawnPoints1.push_back({ 570,220 });
+	spawnPoints1.push_back({ 1110,170 });
 
 
 
 
+	spawnPoints2.push_back({ 610,420 });
+	spawnPoints2.push_back({ 580,720 });
 
-	p1->position = spawnPoints1.at(2);
-	p2->position = spawnPoints1.at(3);
+	spawnPoints2.push_back({ 75,720 });
+	spawnPoints2.push_back({ 170,720 });
+
+	spawnPoints2.push_back({ 70,120 });
+	spawnPoints2.push_back({ 110,120 });
+
+	spawnPoints2.push_back({ 570,210 });
+	spawnPoints2.push_back({ 1110,170 });
+
+
+
+	spawnPoints3.push_back({1470,850 });
+	spawnPoints3.push_back({ 1620,760 });
+
+	spawnPoints3.push_back({ 610,420 });
+	spawnPoints3.push_back({ 580,720 });
+
+	spawnPoints3.push_back({ 75,720 });
+	spawnPoints3.push_back({ 170,720 });
+
+	spawnPoints3.push_back({ 70,120 });
+	spawnPoints3.push_back({ 110,80 });
+
+	spawnPoints3.push_back({ 570,220 });
+	spawnPoints3.push_back({ 1110,170 });
+
+
+
+
+
+	p1->position = spawnPoints1.at(0);
+	p2->position = spawnPoints1.at(1);
 
 
 
@@ -233,36 +236,38 @@ int main(int argc, char* args[])
 				}
 			}
 
-			//////////////////
-			// Draw players //
-			//////////////////
-			// P1
-			
 
-
-
-			//if (collisions) {
-			//	p1->checkCollision(*p2);
-			//	p2->checkCollision(*p1);
-			//}
 
 			
-			p1->Move();
-			p2->Move();
+			p1->checkCollision(*p2);
+			p1->separate(*p2);
+			p2->checkCollision(*p1);
+			p2->separate(*p1);
+			p1->MoveX();
+			if(collideWithLabirynthWalls(p1, *map, false, scoreboard)){
+				p1->position.x -= int(round(p1->velocity.x));
+			}
+			p1->MoveY();
+			if (collideWithLabirynthWalls(p1, *map, false, scoreboard)) {
+				p1->position.y -= int(round(p1->velocity.y));
+			}
+			p2->MoveX();
+			if (collideWithLabirynthWalls(p2, *map, true, scoreboard)) {
+				p2->position.x -= int(round(p2->velocity.x));
+			}
+			p2->MoveY();
+			if (collideWithLabirynthWalls(p2, *map, true, scoreboard)) {
+				p2->position.y -= int(round(p2->velocity.y));
+			}
 
-			collideWithLabirynthWalls(p1, *map, false, scoreboard);
-			collideWithLabirynthWalls(p2, *map, true, scoreboard);
-
-			
-			//if (separation) {
-			//	p1->separate(*p2);
-			//	p2->separate(*p1);
-			//}
+	
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
 			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
 			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2,p1->radius*2);
 			DrawCircle(gRenderer, p2->screenPosition.x, p2->screenPosition.y,p2->radius);
+			DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p2->radius);
+
 			DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
 			DrawDottedLine(gRenderer, p2->screenPosition.x, p2->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
 			SDL_RenderPresent(gRenderer);

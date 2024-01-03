@@ -81,12 +81,11 @@ void Player::updateScreenPosition(int x, int y) {
 
 
 
-void Player::Move()
+void Player::MoveX()
 {
 	float smooth = 0.94;
 	// ten czas jest bez sensu, nie wiem jak to inaczej zrobic, ale to na pewno jest glupie
 	velocity.x = targetVelocity.x * (1.0f - smooth) + velocity.x * smooth;
-	velocity.y = targetVelocity.y * (1.0f - smooth) + velocity.y * smooth;
 
 
 
@@ -95,7 +94,18 @@ void Player::Move()
 	if (screenPosition.x + radius*2 + int(round(velocity.x)) <= SCREEN_WIDTH && screenPosition.x + int(round(velocity.x)) >= 0) {
 		position.x += int(round(velocity.x));
 	}
-	if (screenPosition.y + radius*2 + int(round(velocity.y)) <= SCREEN_HEIGHT && screenPosition.y + int(round(velocity.y)) >= 0) {
+
+
+}
+void Player::MoveY()
+{
+	float smooth = 0.94;
+	// ten czas jest bez sensu, nie wiem jak to inaczej zrobic, ale to na pewno jest glupie
+	velocity.y = targetVelocity.y * (1.0f - smooth) + velocity.y * smooth;
+
+
+
+	if (screenPosition.y + radius * 2 + int(round(velocity.y)) <= SCREEN_HEIGHT && screenPosition.y + int(round(velocity.y)) >= 0) {
 		position.y += int(round(velocity.y));
 	}
 

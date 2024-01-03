@@ -12,12 +12,14 @@
 
 float clamp(float value, float min, float max);
 bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
-void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb);
+bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb);
 void separate(Player* player, float tileX, float tileY, Vector2f closestPoint);
 bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
+bool checkIfCircleAndRectOverlap(Player* player, Player* player2, bool collide);
+void separate(Player* player, Player* player2, Vector2f closestPoint);
 
 //function for a circle colliding with a rectangluar wall hitbox
-void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb) {
+bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb) {
 	//find the tile that the player's center is in
 	int tileX = player->position.x / TILE_SIZE;
 	int tileY = player->position.y / TILE_SIZE;
@@ -30,13 +32,16 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 				if (map[tileY + i][tileX + j] == '=') {
 					if (circle)
 					{
-						checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, true);
+						if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, false)) {
+							return true;
+						}
 					}
 					else
 					{
-						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i, true)) {
-							return;
+						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i, false)) {
+							return true;
 						}
+
 					}
 				}
 				if (map[tileY + i][tileX + j] == 'w') {
@@ -44,14 +49,14 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 					{
 						if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, false)) {
 							scrb->win(1);
-							return;
+							return true;
 						}
 					}
 					else
 					{
 						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i, false)) {
 							scrb->win(2);
-							return;
+							return true;
 						}
 
 					}
@@ -59,6 +64,7 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 			}
 		}
 	}
+	return false;
 }
 	// if they do, move the player by the separation vector
 
@@ -128,6 +134,10 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, b
 }
 
 
+
+
+
+
 float clamp(float value, float min, float max) {
 	if (value <= min) {
 		return min;
@@ -147,6 +157,9 @@ void separate(Player* player, float tileX, float tileY, Vector2f closestPoint) {
 		float right = tileX* TILE_SIZE + TILE_SIZE - player->position.x + player->radius;
 		float top = player->position.y - tileY * TILE_SIZE + player->radius;
 		float bottom = tileY * TILE_SIZE + TILE_SIZE - player->position.y + player->radius;
+
+
+
 		separation.x = left < right ? -left : right;
 		separation.y = top < bottom ? -top : bottom;
 	}
@@ -162,4 +175,51 @@ void separate(Player* player, float tileX, float tileY, Vector2f closestPoint) {
 	}
 	player->position.x += separation.x;
 	player->position.y += separation.y;
+}
+
+
+
+
+// THESE FUNCTIONS ARE FOR COLLISIONS BETWEEN PLAYERS
+// player1 is a circle and player2 is a rectangle
+bool checkIfCircleAndRectOverlap(Player* player, Player* player2, bool collide) {
+	Vector2f closestPoint;
+	closestPoint.x = clamp(player->position.x, player2->position.x - player2->radius, player2->position.x + player2->radius);
+	closestPoint.y = clamp(player->position.y, player2->position.y - player2->radius, player2->position.x + player2->radius);
+
+	float distance;
+	distance = sqrt(pow(player->position.x - closestPoint.x, 2) + pow(player->position.y - closestPoint.y, 2));
+
+	if (distance < player->radius) {
+		if (collide) separate(player, player2, closestPoint);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+void separate(Player* player, Player* player2, Vector2f closestPoint) {
+	Vector2f separation;
+	if (player->position.x == closestPoint.x && player->position.y == closestPoint.y) {
+		float left = player->position.x - player2->position.x - player2->radius + player->radius;
+		float right = player2->position.x + player2->radius - player->position.x + player->radius;
+		float top = player->position.y - player2->position.y - player2->radius + player->radius;
+		float bottom = player2->position.y + player2->radius - player->position.y + player->radius;
+		separation.x = left < right ? -left : right;
+		separation.y = top < bottom ? -top : bottom;
+	}
+	else {
+		separation.x = player->position.x - closestPoint.x;
+		separation.y = player->position.y - closestPoint.y;
+
+		float distance = sqrt(separation.x * separation.x + separation.y * separation.y);
+		float factor = (player->radius - distance) / distance;
+
+		separation.x *= factor;
+		separation.y *= factor;
+	}
+	player->position.x += separation.x/2;
+	player->position.y += separation.y/2;
+	player2->position.x -= separation.x/2;
+	player2->position.y -= separation.y/2;
 }
