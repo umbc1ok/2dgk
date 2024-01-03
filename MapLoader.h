@@ -5,27 +5,27 @@
 #include <SDL_image.h>
 #include "definitions.h"
 
-std::vector<std::string> loadMapFromFile(std::string fileName);
+std::vector<std::string>* loadMapFromFile(std::string fileName);
 void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture);
 SDL_Surface* loadSurface(std::string path, SDL_Surface* gScreenSurface);
 bool loadMedia(char name[], SDL_Texture** gTexture, SDL_Renderer* gRenderer);
 SDL_Texture* loadTexture(std::string path, SDL_Renderer* gRenderer);
 void drawPlayer(SDL_Renderer* gRenderer, SDL_Texture* playerTexture, int x, int y);
 
-std::vector<std::string> loadMapFromFile(std::string fileName) {
-	std::vector<std::string> map;
+std::vector<std::string>* loadMapFromFile(std::string fileName) {
+	std::vector<std::string>* map = new std::vector<std::string>();
 	std::string line;
 	std::ifstream MyReadFile(fileName);
 	while (getline(MyReadFile, line)) {
-		map.push_back(line);
+		map->push_back(line);
 	}
 	MyReadFile.close();
 	return map;
 }
 void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture) {
-	SDL_Rect fillRect = { x, y, TILE_SIZE, TILE_SIZE };
+	SDL_Rect fillRect = { x, y, TILE_SIZE, TILE_SIZE};
 	if (sign == '=') {
-		SDL_SetRenderDrawColor(gRenderer, 173, 216, 230, 0xFF);
+		SDL_SetRenderDrawColor(gRenderer, 50, 50, 50, 0xFF);
 		SDL_RenderFillRect(gRenderer, &fillRect);
 	}
 	else if (sign == 'x') {

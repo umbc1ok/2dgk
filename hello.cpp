@@ -15,8 +15,6 @@ and may not be redistributed without written permission.*/
 #include "scoreboard.h"
 
 
-
-float scale = 1.0f;
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
 
@@ -44,7 +42,7 @@ void close();
 void DrawCircle(SDL_Renderer* renderer, int centreX, int centreY, int radius);
 void DrawQuad(SDL_Renderer* renderer, int x, int y, int width, int height);
 void DrawDottedLine(SDL_Renderer* renderer, int x0, int y0, int x1, int y1);
-
+Vector2f randomizeTreasure(std::vector<std::string>* map);
 
 
 
@@ -58,12 +56,62 @@ int main(int argc, char* args[])
 	Scoreboard* scoreboard = new Scoreboard();
 
 
-	//p1->radius = p1->radius / 2;
-	p1->position = { rand() % 750 + 50,rand() % 500 + 50 };
-	p2->position = { rand() % 750 + 50,rand() % 500 + 50 };
+	p1->radius = 10;
+	p2->radius = 10;
+	std::vector<Vector2i> spawnPoints1;
+	std::vector<Vector2i> spawnPoints2;
+	std::vector<Vector2i> spawnPoints3;
+	spawnPoints1.push_back({ 60,110 });
+	spawnPoints1.push_back({ 110,60 });
 
-	std::vector<Vector2i> spawnPoints;
-	spawnPoints.push_back({ 50,50 });
+
+	spawnPoints1.push_back({ 1260,560 });
+	spawnPoints1.push_back({ 1110,560 });
+
+	spawnPoints1.push_back({ 560,210 });
+	spawnPoints1.push_back({ 1110,210 });
+
+
+
+
+	spawnPoints2.push_back({ 610,460 });
+	spawnPoints2.push_back({ 560,760 });
+
+	spawnPoints2.push_back({ 60,760 });
+	spawnPoints2.push_back({ 160,760 });
+
+	spawnPoints2.push_back({ 60,110 });
+	spawnPoints2.push_back({ 110,60 });
+
+	spawnPoints2.push_back({ 560,210 });
+	spawnPoints2.push_back({ 1110,210 });
+
+
+
+	spawnPoints3.push_back({1460,850 });
+	spawnPoints3.push_back({ 1610,800 });
+
+	spawnPoints3.push_back({ 610,460 });
+	spawnPoints3.push_back({ 560,760 });
+
+	spawnPoints3.push_back({ 60,760 });
+	spawnPoints3.push_back({ 160,760 });
+
+	spawnPoints3.push_back({ 60,110 });
+	spawnPoints3.push_back({ 110,60 });
+
+	spawnPoints3.push_back({ 560,210 });
+	spawnPoints3.push_back({ 1110,210 });
+
+
+
+
+
+	p1->position = spawnPoints1.at(4);
+	p2->position = spawnPoints1.at(5);
+
+
+
 
 
 
@@ -103,7 +151,12 @@ int main(int argc, char* args[])
 		loadMedia(arr4, &player2Texture, gRenderer);
 
 
-		std::vector<std::string> map = loadMapFromFile("map2.txt");
+		std::vector<std::string>* map = loadMapFromFile("map4.txt");
+
+		Vector2f treasureTile = randomizeTreasure(map);
+
+
+
 
 		int targetX = 0;
 		float cameraSmooth = 0.93f;
@@ -117,15 +170,25 @@ int main(int argc, char* args[])
 				p1->position = { rand() % 750 + 50,rand() % 500 + 50 };
 				p2->position = { rand() % 750 + 50,rand() % 500 + 50 };
 				std::cout << currentMap << std::endl;
-				if (currentMap == 1) {
+				if (currentMap == 0) {
+					map = loadMapFromFile("map2.txt");
+					int positionSetIndex = rand() % (spawnPoints1.size()/2);
+					p1->position = spawnPoints1.at(positionSetIndex*2);
+					p2->position = spawnPoints1.at(positionSetIndex*2 + 1);
+				}
+				else if (currentMap == 1) {
 					map = loadMapFromFile("map3.txt");
+					int positionSetIndex = rand() % (spawnPoints2.size()/2);
+					p1->position = spawnPoints2.at(positionSetIndex*2);
+					p2->position = spawnPoints2.at(positionSetIndex*2 + 1);
 				}
 				else if (currentMap == 2) {
 					map = loadMapFromFile("map4.txt");
+					int positionSetIndex = rand() % (spawnPoints3.size()/2);
+					p1->position = spawnPoints3.at(positionSetIndex*2);
+					p2->position = spawnPoints3.at(positionSetIndex*2 + 1);
 				}
-				else if (currentMap == 0) {
-					map = loadMapFromFile("map2.txt");
-				}
+				treasureTile = randomizeTreasure(map);
 			}
 			///////////////////////
 			// FRAMETIME COUNTER //
@@ -164,7 +227,7 @@ int main(int argc, char* args[])
 			int numberOfColumns = LEVEL_WIDTH / TILE_SIZE;
 			int numberOfRows = LEVEL_HEIGHT / TILE_SIZE;
 			for (int i = 0; i < numberOfRows; i++) {
-				std::string line = map.at(i);
+				std::string line = map->at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
 					drawElement(j* TILE_SIZE -camera.x, i* TILE_SIZE -camera.y, line.at(j), gRenderer,woodTexture,grassTexture);
 				}
@@ -175,31 +238,33 @@ int main(int argc, char* args[])
 			//////////////////
 			// P1
 			
-			collideWithLabirynthWalls(p1, map, true, scoreboard);
-			collideWithLabirynthWalls(p2, map, true, scoreboard);
 
 
 
-			if (collisions) {
-				p1->checkCollision(*p2);
-				p2->checkCollision(*p1);
-			}
+			//if (collisions) {
+			//	p1->checkCollision(*p2);
+			//	p2->checkCollision(*p1);
+			//}
+
 			
 			p1->Move();
 			p2->Move();
 
+			collideWithLabirynthWalls(p1, *map, false, scoreboard);
+			collideWithLabirynthWalls(p2, *map, true, scoreboard);
+
 			
-			if (separation) {
-				p1->separate(*p2);
-				p2->separate(*p1);
-			}
+			//if (separation) {
+			//	p1->separate(*p2);
+			//	p2->separate(*p1);
+			//}
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
 			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
 			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2,p1->radius*2);
 			DrawCircle(gRenderer, p2->screenPosition.x, p2->screenPosition.y,p2->radius);
-			DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, 725-camera.x, 475 - camera.y);
-			DrawDottedLine(gRenderer, p2->screenPosition.x, p2->screenPosition.y, 725-camera.x, 475 - camera.y);
+			DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
+			DrawDottedLine(gRenderer, p2->screenPosition.x, p2->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
 			SDL_RenderPresent(gRenderer);
 			if (desiredFrameTime > deltaTime) // If the desired frame delay is greater than the deltaTime
 			{
@@ -315,12 +380,12 @@ void DrawQuad(SDL_Renderer* renderer, int x, int y, int width, int height)
 	y -= height / 2;
 	SDL_Color color;
 	color.r = 255;
-	color.g = 255;
-	color.b = 255;
+	color.g = 0;
+	color.b = 0;
 	color.a = 255;
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_Rect rect = { x,y,width,height };
-	SDL_RenderDrawRect(renderer, &rect);
+	SDL_RenderFillRect(renderer, &rect);
 }
 
 void DrawDottedLine(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
@@ -336,6 +401,28 @@ void DrawDottedLine(SDL_Renderer* renderer, int x0, int y0, int x1, int y1) {
 		if (e2 > dy) { err += dy; x0 += sx; }
 		if (e2 < dx) { err += dx; y0 += sy; }
 		count = (count + 1) % 20;
+	}
+}
+
+Vector2f randomizeTreasure(std::vector<std::string>* map) {
+	int numberOfColumns = LEVEL_WIDTH / TILE_SIZE;
+	int numberOfRows = LEVEL_HEIGHT / TILE_SIZE;
+	bool searching = true;
+	for (int i = 0; i < numberOfColumns; i++) {
+		for (int j = 0; j < numberOfRows; j++) {
+			if (map->at(j).at(i) == 'w') {
+				map->at(j).at(i) = 'x';
+			}
+		}
+	}
+	while (searching) {
+		int x = rand() % numberOfColumns;
+		int y = rand() % numberOfRows;
+		if (map->at(y).at(x) == 'x') {
+			map->at(y).at(x) = 'w';
+			searching = false;
+			return { float(x),float(y) };
+		}
 	}
 }
 

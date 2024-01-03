@@ -12,7 +12,7 @@
 
 float clamp(float value, float min, float max);
 bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
-void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard scrb);
+void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb);
 void separate(Player* player, float tileX, float tileY, Vector2f closestPoint);
 bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
 
@@ -21,20 +21,20 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 	//find the tile that the player's center is in
 	int tileX = player->position.x / TILE_SIZE;
 	int tileY = player->position.y / TILE_SIZE;
-	
+
 	// go over them and check if they collide with the player
-	for(int i = -1; i < 2; i++)
+	for (int i = -1; i < 2; i++) {
 		for (int j = -1; j < 2; j++) {
 			//honestly copilot told me this condition, but idk how the hell it works, but it does
 			if (tileY + i >= 0 && tileY + i < map.size() && tileX + j >= 0 && tileX + j < map.at(0).size()) {
 				if (map[tileY + i][tileX + j] == '=') {
 					if (circle)
 					{
-						checkIfCircleAndRectOverlap(player, tileX + j, tileY + i,true);
+						checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, true);
 					}
 					else
 					{
-						checkIfRectAndRectOverlap(player, tileX + j, tileY + i,true);
+						checkIfRectAndRectOverlap(player, tileX + j, tileY + i, true);
 					}
 				}
 				if (map[tileY + i][tileX + j] == 'w') {
@@ -47,7 +47,7 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 					}
 					else
 					{
-						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i,false)) {
+						if (checkIfRectAndRectOverlap(player, tileX + j, tileY + i, false)) {
 							scrb->win(2);
 							return;
 						}
@@ -56,8 +56,9 @@ void collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 				}
 			}
 		}
-	// if they do, move the player by the separation vector
+	}
 }
+	// if they do, move the player by the separation vector
 
 bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide) {
 	Vector2f closestPoint;
@@ -105,9 +106,18 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, b
 			else if (separation.x > separation.y) {
 				separation.x = 0;
 			}
+			if (separation.x != 0) {
+				player->velocity.x = 0;
+				player->targetVelocity.x = 0;
+			}
+			if (separation.y != 0) {
+				player->velocity.y = 0;
+				player->targetVelocity.y = 0;
+			}
 			player->position.x += separation.x;
 			player->position.y += separation.y;
 		}
+
 		return true;
 	}
 }

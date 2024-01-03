@@ -15,8 +15,8 @@ void moveCamera(SDL_Rect* camera, Player* p1, Player* p2, Vector2i boundingBox, 
 
 	camera->x = *targetX * (1.0f - CAMERA_SMOOTH) + camera->x * CAMERA_SMOOTH;
 	*/
-	camera->x = ((p1->position.x - SCREEN_WIDTH / 2 + 25) + (p2->position.x - SCREEN_WIDTH / 2 + 25)) / 2.0f;
-	camera->y = ((p1->position.y - SCREEN_HEIGHT / 2 + 25) + (p2->position.y - SCREEN_HEIGHT / 2 + 25)) / 2.0f;
+	camera->x = ((p1->position.x - SCREEN_WIDTH / 2 + p1->radius) + (p2->position.x - SCREEN_WIDTH / 2 + p2->radius)) / 2.0f;
+	camera->y = ((p1->position.y - SCREEN_HEIGHT / 2 + p1->radius) + (p2->position.y - SCREEN_HEIGHT / 2 + p2->radius)) / 2.0f;
 
 	keepCameraInBounds(camera);
 }
