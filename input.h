@@ -33,6 +33,28 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed){
 		case SDLK_d:
 			p1->targetVelocity.x = maxSpeed;
 			break;
+		case SDLK_1:
+			p1->MAX_H += 10;
+			if (p1->MAX_H <= 0) {
+				p1->MAX_H = 1;
+			}
+			p1->calculateNewGravity();
+			break;
+		case SDLK_2:
+			p1->MAX_H -= 10;
+			p1->calculateNewGravity();
+			break;
+		case SDLK_3:
+			p1->MAX_DISTANCE += 10;
+			p1->calculateNewGravity();
+			break;
+		case SDLK_4:
+			p1->MAX_DISTANCE -= 10;
+			if (p1->MAX_DISTANCE <= 0) {
+				p1->MAX_DISTANCE = 1;
+			}
+			p1->calculateNewGravity();
+			break;
 		case SDLK_ESCAPE:
 			quit = true;
 			break;

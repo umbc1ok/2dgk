@@ -99,7 +99,7 @@ bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, b
 	float top = playerBottom - tileYIndex * TILE_SIZE;
 	float bottom = tileYIndex * TILE_SIZE + TILE_SIZE - playerTop;
 
-	if (left <= 0 || right <= 0 || top <= 0 || bottom <= 0) {
+	if (left < 0 || right < 0 || top < 0 || bottom < 0) {
 		return false;
 	}
 	else {

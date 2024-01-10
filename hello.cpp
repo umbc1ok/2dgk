@@ -252,18 +252,18 @@ int main(int argc, char* args[])
 
 			//std::cout << p1->velocity.x << std::endl;
 			p1->jump(CURRENT, PREVIOUS, deltaTime);
+
 			if (collideWithLabirynthWalls(p1, *map, false, scoreboard)) {
 				p1->position.y -= int(round(p1->tempVelocity.y));
 				p1->velocity.y = 0;
-				std::cout << "DUPA";
+				p1->tempVelocity.y = 0;
 			}
-			std::cout << p1->position.y << std::endl;
-			std::cout << "WHAT:" << p1->velocity.y << std::endl;
+
 
 	
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
-			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2,p1->radius*2);
+			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2, p1->radius*2);
 
 
 			//DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
