@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include "definitions.h"
+#include <SDL.h>
 
 Player::Player()
 {
@@ -14,6 +15,9 @@ Player::Player()
 	Player::screenPosition.x = 0;
 	Player::screenPosition.y = 0;
 	Player::radius = 10;
+	calculateNewGravity();
+	Player::tempVelocity.x = 0;
+	Player::tempVelocity.y = 0;
 
 }
 
@@ -49,27 +53,33 @@ void Player::checkCollision(Player other) {
 	}
 }
 
-void Player::wallCollision() {
+bool Player::wallCollision() {
 	if (position.x + radius > LEVEL_WIDTH)  {
 		if (velocity.x > 0) {
 			velocity.x *= -1;
 		}
+		return true;
 	}
 	else if(position.x - radius < 0) {
 		if (velocity.x < 0) {
 			velocity.x *= -1;
 		}
+		return true;
 	}
 	if (position.y + radius > LEVEL_HEIGHT) {
 		if (velocity.y > 0) {
 			velocity.y *= -1;
 		}
+		return true;
 	}
 	else if (position.y - radius < 0) {
 		if (velocity.y < 0) {
 			velocity.y *= -1;
 		}
+		return true;
 	}
+
+	return false;
 
 }
 
@@ -110,6 +120,50 @@ void Player::MoveY()
 	}
 
 }
+
+void Player::jump(Uint64 currentTime, Uint64 prevTime, Uint64 deltaTime) {
+
+	float sY = this->position.y;
+	float velocityPart = this->velocity.y * deltaTime;
+	float accelerationPart = 0.5 * gravity * deltaTime * deltaTime;
+	float difference = accelerationPart + velocityPart;
+
+
+	this->tempVelocity.y = difference;
+	this->position.y += difference;
+	if (!jumpPressed || jumpTime > 30){
+		this->velocity.y += gravity * deltaTime;
+	}
+	else {
+		jumpTime++;
+	}
+
+
+	if (wallCollision()) {
+		this->velocity.y = 0;
+		this->position.y = sY;
+		jumpTime = 0;
+		jumpPressed = false;
+		if ((position.y + radius > LEVEL_HEIGHT)) // tu powinno byc jeszcze sprawdzenie czy nie dotyka klocka jakiegoœ od góry
+			jumpCount = 0;
+	}
+
+
+
+
+	
+}
+
+void Player::calculateNewGravity()
+{
+	V_0 = -(2 * MAX_H * VEL / MAX_DISTANCE);
+	gravity = (2 * MAX_H * VEL * VEL) /
+		(MAX_DISTANCE * MAX_DISTANCE);
+
+	printf("Nowe wartosci:\n - grawitacja: %f,\n - V_0: %f,\n - maksymalna wysokosc: %f,\n - maksymalna odleglosc pozioma: %f\n\n", gravity, V_0, MAX_H, MAX_DISTANCE);
+
+}
+
 
 
 // for some reason when one person is going left, and the other is going right
@@ -156,5 +210,14 @@ void Player::separate(Player other)
 	}
 
 
+}
+
+void Player::handleJump() {
+	if (jumpCount < 2) {
+		jumpPressed = true;
+		jumpCount++;
+		jumpTime = 0;
+		velocity.y = V_0 * 0.5f;
+	}
 }
 

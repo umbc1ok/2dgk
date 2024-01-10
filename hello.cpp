@@ -140,7 +140,7 @@ int main(int argc, char* args[])
 	{
 		Uint64 PREVIOUS = 0;
 		Uint64 CURRENT = 0;
-		Uint64 deltaTime;
+		Uint64 deltaTime = 0;
 		Uint64 desiredFrameTime = 17; // 1/60 of a second
 
 
@@ -166,7 +166,7 @@ int main(int argc, char* args[])
 		bool collisions = true;
 		bool separation = true;
 		int currentMap = 0;
-
+		CURRENT = 0;
 		while (!quit) {
 			if (currentMap != scoreboard->checkCurrentMap()) {
 				currentMap = scoreboard->checkCurrentMap();
@@ -196,31 +196,35 @@ int main(int argc, char* args[])
 			///////////////////////
 			// FRAMETIME COUNTER //
 			///////////////////////
+			
 			PREVIOUS = CURRENT;
 			CURRENT = SDL_GetPerformanceCounter();
+			if (PREVIOUS == 0) {
+				PREVIOUS = CURRENT;
+			}
 			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
 
 			/////////////////////
 			// CAMERA MOVEMENT //
 			/////////////////////
 
-			moveCamera(&camera, p1, p2, boundingBox, &targetX);
+			// double P1 is on purpose, i didnt want to change the script when I have 1 player
+			moveCamera(&camera, p1, p1, boundingBox, &targetX);
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
 			/////////////////////////////////////
 
 			// KEYBOARD (PLAYER 1)
-			p1->targetVelocity = { 0,0 };
-			p2->targetVelocity = { 0,0 };
+
 			int maxSpeed = 3;
 			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-			handleKeyboardInput(currentKeyStates, p1,p2,maxSpeed);
+			//handleKeyboardInput(currentKeyStates, p1,p2,maxSpeed);
 
 
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
-				quit = handleInput(&e, p1,p2);
+				quit = handleInput(&e, p1,p2,maxSpeed);
 			}
 
 			
@@ -239,37 +243,30 @@ int main(int argc, char* args[])
 
 
 			
-			p1->checkCollision(*p2);
-			p1->separate(*p2);
-			p2->checkCollision(*p1);
-			p2->separate(*p1);
+
+
 			p1->MoveX();
 			if(collideWithLabirynthWalls(p1, *map, false, scoreboard)){
 				p1->position.x -= int(round(p1->velocity.x));
 			}
-			p1->MoveY();
+
+			//std::cout << p1->velocity.x << std::endl;
+			p1->jump(CURRENT, PREVIOUS, deltaTime);
 			if (collideWithLabirynthWalls(p1, *map, false, scoreboard)) {
-				p1->position.y -= int(round(p1->velocity.y));
+				p1->position.y -= int(round(p1->tempVelocity.y));
+				p1->velocity.y = 0;
+				std::cout << "DUPA";
 			}
-			p2->MoveX();
-			if (collideWithLabirynthWalls(p2, *map, true, scoreboard)) {
-				p2->position.x -= int(round(p2->velocity.x));
-			}
-			p2->MoveY();
-			if (collideWithLabirynthWalls(p2, *map, true, scoreboard)) {
-				p2->position.y -= int(round(p2->velocity.y));
-			}
+			std::cout << p1->position.y << std::endl;
+			std::cout << "WHAT:" << p1->velocity.y << std::endl;
 
 	
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
-			p2->updateScreenPosition(p2->position.x - camera.x, p2->position.y - camera.y);
 			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2,p1->radius*2);
-			DrawCircle(gRenderer, p2->screenPosition.x, p2->screenPosition.y,p2->radius);
-			DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p2->radius);
 
-			DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
-			DrawDottedLine(gRenderer, p2->screenPosition.x, p2->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
+
+			//DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
 			SDL_RenderPresent(gRenderer);
 			if (desiredFrameTime > deltaTime) // If the desired frame delay is greater than the deltaTime
 			{

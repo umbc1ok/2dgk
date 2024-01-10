@@ -13,11 +13,44 @@ enum KeyPressSurfaces
 
 
 // mouse input only
-bool handleInput(SDL_Event* e, Player* p1, Player* p2 ){
+bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed){
 	bool quit = false;
 	if (e->type == SDL_QUIT)
 	{
 		quit = true;
+	}
+
+	if (e->type == SDL_KEYDOWN && e->key.repeat == 0)
+	{
+		switch (e->key.keysym.sym)
+		{
+		case SDLK_w:
+			p1->handleJump();
+			break;
+		case SDLK_a:
+			p1->targetVelocity.x = -maxSpeed;
+			break;
+		case SDLK_d:
+			p1->targetVelocity.x = maxSpeed;
+			break;
+		case SDLK_ESCAPE:
+			quit = true;
+			break;
+		}
+	}
+	else if (e->type == SDL_KEYUP && e->key.repeat == 0) {
+		switch (e->key.keysym.sym)
+		{
+		case SDLK_w:
+			p1->jumpPressed = false;
+			break;
+		case SDLK_a:
+			p1->targetVelocity.x = 0;
+			break;
+		case SDLK_d:
+			p1->targetVelocity.x = 0;
+			break;
+		}
 	}
 	/*else if (e->type == SDL_MOUSEMOTION) {
 		SDL_GetMouseState(&p2->position.x, &p2->position.y);
@@ -33,13 +66,17 @@ void handleKeyboardInput(const Uint8* currentKeyStates, Player* p1, Player* p2, 
 	if (currentKeyStates[SDL_SCANCODE_UP])
 	{
 		//std::cout << "UP\n";
-		p1->targetVelocity.y = -maxSpeed;
+		p1->handleJump();
+		
+	}
+	else {
+		p1->jumpPressed = false;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_DOWN])
 	{
 		//std::cout << "DOWN\n";
-		p1->targetVelocity.y = maxSpeed;
+		//p1->targetVelocity.y = maxSpeed;
 	}
 
 	if (currentKeyStates[SDL_SCANCODE_LEFT])
