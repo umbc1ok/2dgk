@@ -12,14 +12,14 @@
 
 float clamp(float value, float min, float max);
 bool checkIfCircleAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
-bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb);
+bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb, bool separate);
 void separate(Player* player, float tileX, float tileY, Vector2f closestPoint);
 bool checkIfRectAndRectOverlap(Player* player, int tileXIndex, int tileYIndex, bool collide);
 bool checkIfCircleAndRectOverlap(Player* player, Player* player2, bool collide);
 void separate(Player* player, Player* player2, Vector2f closestPoint);
 
 //function for a circle colliding with a rectangluar wall hitbox
-bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb) {
+bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, bool circle, Scoreboard* scrb,bool separate) {
 	//find the tile that the player's center is in
 	int tileX = player->position.x / TILE_SIZE;
 	int tileY = player->position.y / TILE_SIZE;
@@ -32,7 +32,7 @@ bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 				if (map[tileY + i][tileX + j] == '=') {
 					if (circle)
 					{
-						if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, false)) {
+						if (checkIfCircleAndRectOverlap(player, tileX + j, tileY + i, separate)) {
 							return true;
 						}
 					}
@@ -44,6 +44,7 @@ bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 
 					}
 				}
+				/*
 				if (map[tileY + i][tileX + j] == 'w') {
 					if (circle)
 					{
@@ -61,6 +62,7 @@ bool collideWithLabirynthWalls(Player* player, std::vector<std::string> map, boo
 
 					}
 				}
+				*/
 			}
 		}
 	}

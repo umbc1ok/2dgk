@@ -162,6 +162,7 @@ int main(int argc, char* args[])
 
 
 		int targetX = 0;
+		int targetY = 0;
 		float cameraSmooth = 0.93f;
 		bool collisions = true;
 		bool separation = true;
@@ -209,7 +210,7 @@ int main(int argc, char* args[])
 			/////////////////////
 
 			// double P1 is on purpose, i didnt want to change the script when I have 1 player
-			moveCamera(&camera, p1, p1, boundingBox, &targetX);
+			moveCamera(&camera, p1, p1, boundingBox, &targetX, &targetY);
 			
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
@@ -244,26 +245,27 @@ int main(int argc, char* args[])
 
 			
 
+			p1->jump(CURRENT, PREVIOUS, deltaTime);
+			if (collideWithLabirynthWalls(p1, *map, true, scoreboard,false)) {
+				p1->position.y -= int((p1->tempVelocity.y));
+				p1->velocity.y = 0;
+			}
+
 
 			p1->MoveX();
-			if(collideWithLabirynthWalls(p1, *map, false, scoreboard)){
-				p1->position.x -= int(round(p1->velocity.x));
+			if(collideWithLabirynthWalls(p1, *map, true, scoreboard,true)){
+				//p1->position.x -= int(round(p1->velocity.x));
 			}
 
 			//std::cout << p1->velocity.x << std::endl;
-			p1->jump(CURRENT, PREVIOUS, deltaTime);
 
-			if (collideWithLabirynthWalls(p1, *map, false, scoreboard)) {
-				p1->position.y -= int(round(p1->tempVelocity.y));
-				p1->velocity.y = 0;
-				p1->tempVelocity.y = 0;
-			}
 
 
 	
 			
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
-			DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2, p1->radius*2);
+			//DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2, p1->radius*2);
+			DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p1->radius);
 
 
 			//DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);

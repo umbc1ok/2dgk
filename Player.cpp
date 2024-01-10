@@ -124,6 +124,7 @@ void Player::MoveY()
 void Player::jump(Uint64 currentTime, Uint64 prevTime, Uint64 deltaTime) {
 
 	float sY = this->position.y;
+
 	float velocityPart = this->velocity.y * deltaTime;
 	float accelerationPart = 0.5 * gravity * deltaTime * deltaTime;
 	float difference = accelerationPart + velocityPart;
@@ -132,7 +133,7 @@ void Player::jump(Uint64 currentTime, Uint64 prevTime, Uint64 deltaTime) {
 	this->tempVelocity.y = difference;
 	this->position.y += difference;
 	if (!jumpPressed || jumpTime > 30){
-		this->velocity.y += gravity*1.5 * deltaTime;
+		this->velocity.y += gravity * deltaTime;
 	}
 	else {
 		jumpTime++;
