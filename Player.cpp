@@ -132,7 +132,7 @@ void Player::jump(Uint64 currentTime, Uint64 prevTime, Uint64 deltaTime) {
 	this->tempVelocity.y = difference;
 	this->position.y += difference;
 	if (!jumpPressed || jumpTime > 30){
-		this->velocity.y += gravity * deltaTime;
+		this->velocity.y += gravity*1.5 * deltaTime;
 	}
 	else {
 		jumpTime++;
