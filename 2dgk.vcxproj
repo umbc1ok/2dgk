@@ -152,11 +152,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="collisions.h" />
     <ClInclude Include="dataStructures.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="scoreboard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
