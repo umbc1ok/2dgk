@@ -34,6 +34,8 @@ SDL_Texture* woodTexture = NULL;
 SDL_Texture* grassTexture = NULL;
 SDL_Texture* playerTexture = NULL;
 SDL_Texture* player2Texture = NULL;
+SDL_Texture* skyTexture = NULL;
+SDL_Texture* fernTexture = NULL;
 
 
 
@@ -146,15 +148,20 @@ int main(int argc, char* args[])
 
 		char arr[] = "wood.jpg";
 		loadMedia(arr, &woodTexture, gRenderer);
-		char arr2[] = "grass.jpg";
+		char arr2[] = "grass.png";
 		loadMedia(arr2, &grassTexture, gRenderer);
 		char arr3[] = "player.png";
 		loadMedia(arr3, &playerTexture, gRenderer);
 		char arr4[] = "player2.png";
 		loadMedia(arr4, &player2Texture, gRenderer);
-
+		char arr5[] = "sky.png";
+		loadMedia(arr5, &skyTexture, gRenderer);
+		char arr6[] = "fern.png";
+		loadMedia(arr6, &fernTexture, gRenderer);
 
 		std::vector<std::string>* map = loadMapFromFile("map2.txt");
+		std::vector<std::string>* map2 = loadMapFromFile("map3.txt");
+		std::vector<std::string>* map3 = loadMapFromFile("map4.txt");
 
 		Vector2f treasureTile = randomizeTreasure(map);
 
@@ -232,15 +239,33 @@ int main(int argc, char* args[])
 			/////////////////
 			// MAP DRAWING //
 			/////////////////
+			// BACKGROUND
 			int numberOfColumns = LEVEL_WIDTH / TILE_SIZE;
 			int numberOfRows = LEVEL_HEIGHT / TILE_SIZE;
 			for (int i = 0; i < numberOfRows; i++) {
-				std::string line = map->at(i);
+				std::string line = map3->at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
-					drawElement(j* TILE_SIZE -camera.x, i* TILE_SIZE -camera.y, line.at(j), gRenderer,woodTexture,grassTexture);
+					drawElement(4 * SCREEN_WIDTH - j * TILE_SIZE - camera.x * 0.2, i * TILE_SIZE - camera.y, line.at(j), gRenderer, woodTexture, grassTexture, skyTexture, fernTexture);
 				}
 			}
 
+
+			// SECOND LAYER
+			for (int i = 0; i < numberOfRows; i++) {
+				std::string line = map2->at(i);
+				for (int j = 0; j < numberOfColumns; j++) {
+					drawElement(4*SCREEN_WIDTH - j * TILE_SIZE - camera.x*0.8, i * TILE_SIZE - camera.y, line.at(j), gRenderer, woodTexture, grassTexture, skyTexture, fernTexture);
+				}
+			}
+
+			// FRONT LAYER
+			for (int i = 0; i < numberOfRows; i++) {
+				std::string line = map->at(i);
+				for (int j = 0; j < numberOfColumns; j++) {
+					drawElement(j* TILE_SIZE -camera.x, i* TILE_SIZE -camera.y, line.at(j), gRenderer,woodTexture,grassTexture, skyTexture, fernTexture);
+				}
+			}
+			
 
 
 			

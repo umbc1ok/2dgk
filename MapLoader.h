@@ -22,7 +22,7 @@ std::vector<std::string>* loadMapFromFile(std::string fileName) {
 	MyReadFile.close();
 	return map;
 }
-void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture) {
+void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* woodTexture, SDL_Texture* grassTexture, SDL_Texture* skyTexture, SDL_Texture* fernTexture) {
 	SDL_Rect fillRect = { x, y, TILE_SIZE, TILE_SIZE};
 	if (sign == '=') {
 		SDL_SetRenderDrawColor(gRenderer, 50, 50, 50, 0xFF);
@@ -32,12 +32,14 @@ void drawElement(int x, int y, char sign, SDL_Renderer* gRenderer, SDL_Texture* 
 		SDL_RenderCopy(gRenderer, grassTexture, NULL, &fillRect);
 	}
 	else if (sign == 't') {
-		SDL_SetRenderDrawColor(gRenderer, 150, 75, 0, 0xFF);
-		SDL_RenderFillRect(gRenderer, &fillRect);
+		SDL_RenderCopy(gRenderer, skyTexture, NULL, &fillRect);
+		//SDL_SetRenderDrawColor(gRenderer, 150, 75, 0, 0xFF);
+		//SDL_RenderFillRect(gRenderer, &fillRect);
 	}
 	else if (sign == 's') {
-		SDL_SetRenderDrawColor(gRenderer, 255, 255, 0, 0xFF);
-		SDL_RenderFillRect(gRenderer, &fillRect);
+		SDL_RenderCopy(gRenderer, fernTexture, NULL, &fillRect);
+		//SDL_SetRenderDrawColor(gRenderer, 255, 255, 0, 0xFF);
+		//SDL_RenderFillRect(gRenderer, &fillRect);
 	}
 	else if (sign == 'w') {
 		SDL_RenderCopy(gRenderer, woodTexture, NULL, &fillRect);

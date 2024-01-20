@@ -1,12 +1,12 @@
 #pragma once
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 640
 
-#define LEVEL_WIDTH 1900
-#define LEVEL_HEIGHT 950
+#define LEVEL_WIDTH 3200
+#define LEVEL_HEIGHT 608
 
 
 #define CAMERA_SMOOTH 0.93f
 
-#define TILE_SIZE 50
+#define TILE_SIZE 32
