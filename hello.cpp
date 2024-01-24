@@ -172,10 +172,23 @@ int main(int argc, char* args[])
 		char arr7[] = "tiles/player.png";
 		loadMedia(arr7, &playerTexture, gRenderer);
 
-		for (int i = 0; i < 8; i++) {
-			//char arr8[] = "tiles/" + std::to_string(i) + ".png";
-			//loadMedia(arr8, &frames[i], gRenderer);
-		}
+		char animFrameName1[] = "anim/1.png";
+		loadMedia(animFrameName1, &frames[0], gRenderer);
+		char animFrameName2[] = "anim/2.png";
+		loadMedia(animFrameName2, &frames[1], gRenderer);
+		char animFrameName3[] = "anim/3.png";
+		loadMedia(animFrameName3, &frames[2], gRenderer);
+		char animFrameName4[] = "anim/4.png";
+		loadMedia(animFrameName4, &frames[3], gRenderer);
+		char animFrameName5[] = "anim/5.png";
+		loadMedia(animFrameName5, &frames[4], gRenderer);
+		char animFrameName6[] = "anim/6.png";
+		loadMedia(animFrameName6, &frames[5], gRenderer);
+		char animFrameName7[] = "anim/7.png";
+		loadMedia(animFrameName7, &frames[6], gRenderer);
+		char animFrameName8[] = "anim/8.png";
+		loadMedia(animFrameName8, &frames[7], gRenderer);
+
 
 		std::vector<std::string>* map = loadMapFromFile("map2.txt");
 		std::vector<std::string>* map2 = loadMapFromFile("map3.txt");
@@ -242,17 +255,32 @@ int main(int argc, char* args[])
 			/////////////////////////////////////
 
 			// KEYBOARD (PLAYER 1)
+			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+			
 
 			int maxSpeed = 3;
-			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 			//handleKeyboardInput(currentKeyStates, p1,p2,maxSpeed);
 
 
 			bool pushed = false;
+			bool walking = false;
 			while (SDL_PollEvent(&e) != 0) {
-				quit = handleInput(&e, p1, p2, maxSpeed, layerSpeed);
+				walking = handleInput(&e, p1, p2, maxSpeed, layerSpeed);
 			}
+			if (walking) {
+				animTime += deltaTime;
+				if (animTime > currentAnimFrame * 100) {
+					animTime = 0;
+					currentAnimFrame = (currentAnimFrame + 1) % 8;
+					playerTexture = frames[currentAnimFrame];
+					currentAnimFrame++;
+				}
 
+			}
+			else {
+				animTime = 0;
+			}
 
 			/////////////////
 			// MAP DRAWING //
@@ -310,18 +338,7 @@ int main(int argc, char* args[])
 			//DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2, p1->radius*2);
 			//DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p1->radius);
 
-			if (currentKeyStates[SDLK_d]) {
-				animTime += deltaTime;
-				if (animTime > currentAnimFrame*100) {
-					animTime = 0;
-					currentAnimFrame = (currentAnimFrame + 1) % 8;
-					//playerTexture = frames[currentAnimFrame];
-				}
-				currentAnimFrame++;
-			}
-			else {
-				animTime = 0;
-			}
+			
 			drawPlayer(gRenderer, playerTexture, p1->screenPosition.x - 32, p1->screenPosition.y -48);
 
 

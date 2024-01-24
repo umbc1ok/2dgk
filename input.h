@@ -19,7 +19,14 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed, float layer
 	{
 		quit = true;
 	}
-
+	if (e->type == SDL_KEYDOWN && e->key.repeat !=0) {
+		switch (e->key.keysym.sym)
+		{
+		case SDLK_d:
+			quit = true;
+			break;
+		}
+	}
 	if (e->type == SDL_KEYDOWN && e->key.repeat == 0)
 	{
 		switch (e->key.keysym.sym)
@@ -32,6 +39,7 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed, float layer
 			break;
 		case SDLK_d:
 			p1->targetVelocity.x = maxSpeed;
+			quit = true;
 			break;
 		case SDLK_1:
 			layerSpeed[0] -= 0.1;
