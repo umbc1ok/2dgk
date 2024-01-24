@@ -13,13 +13,20 @@ enum KeyPressSurfaces
 
 
 // mouse input only
-bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed){
+bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed, float layerSpeed[]) {
 	bool quit = false;
 	if (e->type == SDL_QUIT)
 	{
 		quit = true;
 	}
-
+	if (e->type == SDL_KEYDOWN && e->key.repeat !=0) {
+		switch (e->key.keysym.sym)
+		{
+		case SDLK_d:
+			quit = true;
+			break;
+		}
+	}
 	if (e->type == SDL_KEYDOWN && e->key.repeat == 0)
 	{
 		switch (e->key.keysym.sym)
@@ -32,7 +39,33 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed){
 			break;
 		case SDLK_d:
 			p1->targetVelocity.x = maxSpeed;
+			quit = true;
 			break;
+		case SDLK_1:
+			layerSpeed[0] -= 0.1;
+			std::cout << "Layer 0 speed : " << layerSpeed[0] << "\n";
+			break;
+		case SDLK_2:
+			layerSpeed[0] += 0.1;
+			std::cout << "Layer 0 speed : " << layerSpeed[0] << "\n";
+			break;
+		case SDLK_3:
+			layerSpeed[1] -= 0.1;
+			std::cout << "Layer 1 speed : " << layerSpeed[1] << "\n";
+			break;
+		case SDLK_4:
+				layerSpeed[1] += 0.1;
+				std::cout << "Layer 1 speed : " << layerSpeed[1] << "\n";
+			break;
+		case SDLK_5:
+			layerSpeed[2] -= 0.1;
+			std::cout << "Layer 2 speed : " << layerSpeed[2] << "\n";
+			break;
+		case SDLK_6:
+			layerSpeed[2] += 0.1;
+			std::cout << "Layer 2 speed : " << layerSpeed[2] << "\n";
+			break;
+		/*
 		case SDLK_1:
 			p1->MAX_H += 10;
 			if (p1->MAX_H <= 0) {
@@ -55,6 +88,7 @@ bool handleInput(SDL_Event* e, Player* p1, Player* p2, int maxSpeed){
 			}
 			p1->calculateNewGravity();
 			break;
+			*/
 		case SDLK_ESCAPE:
 			quit = true;
 			break;
