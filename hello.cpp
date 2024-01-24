@@ -30,12 +30,15 @@ SDL_Surface* gStretchedSurface = NULL;
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
 //Current displayed texture
-SDL_Texture* woodTexture = NULL;
-SDL_Texture* grassTexture = NULL;
-SDL_Texture* playerTexture = NULL;
-SDL_Texture* player2Texture = NULL;
+SDL_Texture* floorTexture = NULL;
+SDL_Texture* groundTexture = NULL;
 SDL_Texture* skyTexture = NULL;
+SDL_Texture* cloudTexture = NULL;
 SDL_Texture* fernTexture = NULL;
+SDL_Texture* starredTexture = NULL;
+SDL_Texture* playerTexture = NULL;
+SDL_Texture* frames[8];
+
 
 
 
@@ -50,6 +53,7 @@ Vector2f randomizeTreasure(std::vector<std::string>* map);
 
 int main(int argc, char* args[])
 {
+
 	srand(time(NULL));
 	//Setting up players
 	// kwadrat
@@ -59,6 +63,8 @@ int main(int argc, char* args[])
 
 	Scoreboard* scoreboard = new Scoreboard();
 
+	int currentAnimFrame = 0;
+	Uint64 animTime = 0;
 
 	p1->radius = 15;
 	p2->radius = 15;
@@ -133,6 +139,11 @@ int main(int argc, char* args[])
 	bool success = true;
 
 
+
+
+	float layerSpeed[3] = { 0.1,0.4,1.0 };
+
+
 	//Start up SDL and create window
 	if (!init())
 	{
@@ -146,24 +157,31 @@ int main(int argc, char* args[])
 		Uint64 desiredFrameTime = 17; // 1/60 of a second
 
 
-		char arr[] = "wood.jpg";
-		loadMedia(arr, &woodTexture, gRenderer);
-		char arr2[] = "grass.png";
-		loadMedia(arr2, &grassTexture, gRenderer);
-		char arr3[] = "player.png";
-		loadMedia(arr3, &playerTexture, gRenderer);
-		char arr4[] = "player2.png";
-		loadMedia(arr4, &player2Texture, gRenderer);
-		char arr5[] = "sky.png";
-		loadMedia(arr5, &skyTexture, gRenderer);
-		char arr6[] = "fern.png";
-		loadMedia(arr6, &fernTexture, gRenderer);
+		char arr[] = "tiles/floor.png";
+		loadMedia(arr, &floorTexture, gRenderer);
+		char arr2[] = "tiles/ground.png";
+		loadMedia(arr2, &groundTexture, gRenderer);
+		char arr3[] = "tiles/background.png";
+		loadMedia(arr3, &skyTexture, gRenderer);
+		char arr4[] = "tiles/cloud.png";
+		loadMedia(arr4, &cloudTexture, gRenderer);
+		char arr5[] = "tiles/fern.png";
+		loadMedia(arr5, &fernTexture, gRenderer);
+		char arr6[] = "tiles/starred.png";
+		loadMedia(arr6, &starredTexture, gRenderer);
+		char arr7[] = "tiles/player.png";
+		loadMedia(arr7, &playerTexture, gRenderer);
+
+		for (int i = 0; i < 8; i++) {
+			//char arr8[] = "tiles/" + std::to_string(i) + ".png";
+			//loadMedia(arr8, &frames[i], gRenderer);
+		}
 
 		std::vector<std::string>* map = loadMapFromFile("map2.txt");
 		std::vector<std::string>* map2 = loadMapFromFile("map3.txt");
 		std::vector<std::string>* map3 = loadMapFromFile("map4.txt");
 
-		Vector2f treasureTile = randomizeTreasure(map);
+		//Vector2f treasureTile = randomizeTreasure(map);
 
 
 
@@ -183,34 +201,34 @@ int main(int argc, char* args[])
 				std::cout << currentMap << std::endl;
 				if (currentMap == 0) {
 					map = loadMapFromFile("map2.txt");
-					int positionSetIndex = rand() % (spawnPoints1.size()/2);
-					p1->position = spawnPoints1.at(positionSetIndex*2);
-					p2->position = spawnPoints1.at(positionSetIndex*2 + 1);
+					int positionSetIndex = rand() % (spawnPoints1.size() / 2);
+					p1->position = spawnPoints1.at(positionSetIndex * 2);
+					p2->position = spawnPoints1.at(positionSetIndex * 2 + 1);
 				}
 				else if (currentMap == 1) {
 					map = loadMapFromFile("map3.txt");
-					int positionSetIndex = rand() % (spawnPoints2.size()/2);
-					p1->position = spawnPoints2.at(positionSetIndex*2);
-					p2->position = spawnPoints2.at(positionSetIndex*2 + 1);
+					int positionSetIndex = rand() % (spawnPoints2.size() / 2);
+					p1->position = spawnPoints2.at(positionSetIndex * 2);
+					p2->position = spawnPoints2.at(positionSetIndex * 2 + 1);
 				}
 				else if (currentMap == 2) {
 					map = loadMapFromFile("map4.txt");
-					int positionSetIndex = rand() % (spawnPoints3.size()/2);
-					p1->position = spawnPoints3.at(positionSetIndex*2);
-					p2->position = spawnPoints3.at(positionSetIndex*2 + 1);
+					int positionSetIndex = rand() % (spawnPoints3.size() / 2);
+					p1->position = spawnPoints3.at(positionSetIndex * 2);
+					p2->position = spawnPoints3.at(positionSetIndex * 2 + 1);
 				}
-				treasureTile = randomizeTreasure(map);
+				//treasureTile = randomizeTreasure(map);
 			}
 			///////////////////////
 			// FRAMETIME COUNTER //
 			///////////////////////
-			
+
 			PREVIOUS = CURRENT;
 			CURRENT = SDL_GetPerformanceCounter();
 			if (PREVIOUS == 0) {
 				PREVIOUS = CURRENT;
 			}
-			deltaTime = (CURRENT-PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
+			deltaTime = (CURRENT - PREVIOUS) * 1000 / static_cast<float>(SDL_GetPerformanceFrequency());
 
 			/////////////////////
 			// CAMERA MOVEMENT //
@@ -218,7 +236,7 @@ int main(int argc, char* args[])
 
 			// double P1 is on purpose, i didnt want to change the script when I have 1 player
 			moveCamera(&camera, p1, p1, boundingBox, &targetX, &targetY);
-			
+
 			/////////////////////////////////////
 			// Handle mouse and keyboard input //
 			/////////////////////////////////////
@@ -232,10 +250,10 @@ int main(int argc, char* args[])
 
 			bool pushed = false;
 			while (SDL_PollEvent(&e) != 0) {
-				quit = handleInput(&e, p1,p2,maxSpeed);
+				quit = handleInput(&e, p1, p2, maxSpeed, layerSpeed);
 			}
 
-			
+
 			/////////////////
 			// MAP DRAWING //
 			/////////////////
@@ -245,7 +263,7 @@ int main(int argc, char* args[])
 			for (int i = 0; i < numberOfRows; i++) {
 				std::string line = map3->at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
-					drawElement(4 * SCREEN_WIDTH - j * TILE_SIZE - camera.x * 0.2, i * TILE_SIZE - camera.y, line.at(j), gRenderer, woodTexture, grassTexture, skyTexture, fernTexture);
+					drawElement(j * TILE_SIZE - camera.x * layerSpeed[0], i * TILE_SIZE - camera.y, line.at(j), gRenderer, floorTexture, groundTexture, skyTexture, cloudTexture, fernTexture, starredTexture);
 				}
 			}
 
@@ -254,7 +272,7 @@ int main(int argc, char* args[])
 			for (int i = 0; i < numberOfRows; i++) {
 				std::string line = map2->at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
-					drawElement(4*SCREEN_WIDTH - j * TILE_SIZE - camera.x*0.8, i * TILE_SIZE - camera.y, line.at(j), gRenderer, woodTexture, grassTexture, skyTexture, fernTexture);
+					drawElement(j * TILE_SIZE - camera.x * layerSpeed[1], i* TILE_SIZE - camera.y, line.at(j), gRenderer, floorTexture, groundTexture, skyTexture, cloudTexture, fernTexture, starredTexture);
 				}
 			}
 
@@ -262,23 +280,23 @@ int main(int argc, char* args[])
 			for (int i = 0; i < numberOfRows; i++) {
 				std::string line = map->at(i);
 				for (int j = 0; j < numberOfColumns; j++) {
-					drawElement(j* TILE_SIZE -camera.x, i* TILE_SIZE -camera.y, line.at(j), gRenderer,woodTexture,grassTexture, skyTexture, fernTexture);
+					drawElement(j * TILE_SIZE - camera.x * layerSpeed[2], i * TILE_SIZE - camera.y, line.at(j), gRenderer, floorTexture, groundTexture, skyTexture, cloudTexture, fernTexture, starredTexture);
 				}
 			}
-			
 
 
-			
+
+
 
 			p1->jump(CURRENT, PREVIOUS, deltaTime);
-			if (collideWithLabirynthWalls(p1, *map, true, scoreboard,false)) {
+			if (collideWithLabirynthWalls(p1, *map, true, scoreboard, false)) {
 				p1->position.y -= int((p1->tempVelocity.y));
 				p1->velocity.y = 0;
 			}
 
 
 			p1->MoveX();
-			if(collideWithLabirynthWalls(p1, *map, true, scoreboard,true)){
+			if (collideWithLabirynthWalls(p1, *map, true, scoreboard, true)) {
 				//p1->position.x -= int(round(p1->velocity.x));
 			}
 
@@ -286,11 +304,25 @@ int main(int argc, char* args[])
 
 
 
-	
-			
+
+
 			p1->updateScreenPosition(p1->position.x - camera.x, p1->position.y - camera.y);
 			//DrawQuad(gRenderer, p1->screenPosition.x, p1->screenPosition.y,p1->radius*2, p1->radius*2);
-			DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p1->radius);
+			//DrawCircle(gRenderer, p1->screenPosition.x, p1->screenPosition.y, p1->radius);
+
+			if (currentKeyStates[SDLK_d]) {
+				animTime += deltaTime;
+				if (animTime > currentAnimFrame*100) {
+					animTime = 0;
+					currentAnimFrame = (currentAnimFrame + 1) % 8;
+					//playerTexture = frames[currentAnimFrame];
+				}
+				currentAnimFrame++;
+			}
+			else {
+				animTime = 0;
+			}
+			drawPlayer(gRenderer, playerTexture, p1->screenPosition.x - 32, p1->screenPosition.y -48);
 
 
 			//DrawDottedLine(gRenderer, p1->screenPosition.x, p1->screenPosition.y, treasureTile.x*50 + 25-camera.x, treasureTile.y*50 + 25 - camera.y);
@@ -364,7 +396,7 @@ bool init()
 void close()
 {
 	//Deallocate surface
-	SDL_DestroyTexture(woodTexture);
+	//SDL_DestroyTexture(woodTexture);
 	loadedSurface = NULL;
 
 	//Destroy window
